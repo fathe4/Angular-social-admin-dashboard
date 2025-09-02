@@ -1,0 +1,164 @@
+<div class="user-list-container">
+  <!-- Header Section -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1>User Management</h1>
+      <p class="subtitle">Manage users, roles, and permissions</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-primary" routerLink="/users/create">
+        <span class="icon">+</span>
+        Add New User
+      </button>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-value">{{ totalUsers() }}</div>
+      <div class="stat-label">Total Users</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">{{ activeUsersCount }}</div>
+      <div class="stat-label">Active Users</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">{{ inactiveUsersCount }}</div>
+      <div class="stat-label">Inactive Users</div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading()" class="loading-container">
+    <div class="spinner"></div>
+    <p>Loading users...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error()" class="error-container">
+    <div class="error-message">
+      <span class="error-icon">⚠️</span>
+      {{ error() }}
+    </div>
+    <button class="btn btn-secondary" (click)="loadUsers()">Try Again</button>
+  </div>
+
+  <!-- Users Table -->
+  <div *ngIf="!loading() && !error()" class="table-container">
+    <table class="users-table">
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Status</th>
+          <th>Last Login</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of users()" class="user-row">
+          <td class="user-info">
+            <div class="user-avatar">
+              <img 
+                [src]="user.profilePicture || '/assets/default-avatar.svg'" 
+                [alt]="user.firstName + ' ' + user.lastName"
+                onerror="this.src='/assets/default-avatar.svg'"
+              />
+            </div>
+            <div class="user-details">
+              <div class="user-name">{{ user.firstName }} {{ user.lastName }}</div>
+              <div class="username">{{ '@' + user.username }}</div>
+            </div>
+          </td>
+          <td class="user-email">{{ user.email }}</td>
+          <td class="user-role">
+            <span class="role-badge" [class]="'role-' + user.role.name.toLowerCase()">
+              {{ user.role.name }}
+            </span>
+          </td>
+          <td class="user-status">
+            <span class="status-badge" [class]="user.isActive ? 'status-active' : 'status-inactive'">
+              {{ user.isActive ? 'Active' : 'Inactive' }}
+            </span>
+          </td>
+          <td class="user-login">
+            <span *ngIf="user.lastLogin; else noLogin">
+              {{ user.lastLogin | date:'MMM d, y, h:mm a' }}
+            </span>
+            <ng-template #noLogin>
+              <span class="no-login">Never</span>
+            </ng-template>
+          </td>
+          <td class="user-actions">
+            <div class="action-buttons">
+              <button 
+                class="btn btn-sm btn-secondary" 
+                [routerLink]="['/users', user.id]"
+                title="View Details"
+              >
+                👁️
+              </button>
+              <button 
+                class="btn btn-sm btn-secondary" 
+                [routerLink]="['/users', user.id, 'edit']"
+                title="Edit User"
+              >
+                ✏️
+              </button>
+              <button 
+                class="btn btn-sm" 
+                [class]="user.isActive ? 'btn-warning' : 'btn-success'"
+                (click)="toggleUserStatus(user)"
+                [title]="user.isActive ? 'Deactivate User' : 'Activate User'"
+              >
+                {{ user.isActive ? '🔒' : '🔓' }}
+              </button>
+              <button 
+                class="btn btn-sm btn-danger" 
+                (click)="deleteUser(user)"
+                title="Delete User"
+              >
+                🗑️
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Empty State -->
+    <div *ngIf="users().length === 0" class="empty-state">
+      <div class="empty-icon">👥</div>
+      <h3>No users found</h3>
+      <p>Get started by adding your first user to the system.</p>
+      <button class="btn btn-primary" routerLink="/users/create">Add First User</button>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div *ngIf="totalUsers() > pageSize()" class="pagination-container">
+    <div class="pagination-info">
+      Showing {{ paginationStart }} to 
+      {{ paginationEnd }} of {{ totalUsers() }} users
+    </div>
+    <div class="pagination-controls">
+      <button 
+        class="btn btn-secondary btn-sm" 
+        [disabled]="currentPage() === 1"
+        (click)="onPageChange(currentPage() - 1)"
+      >
+        Previous
+      </button>
+      <span class="page-info">Page {{ currentPage() }}</span>
+      <button 
+        class="btn btn-secondary btn-sm" 
+        [disabled]="currentPage() * pageSize() >= totalUsers()"
+        (click)="onPageChange(currentPage() + 1)"
+      >
+        Next
+      </button>
+    </div>
+  </div>
+</div>

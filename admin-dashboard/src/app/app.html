@@ -1,0 +1,20 @@
+<!-- Social Media Admin Dashboard -->
+<div class="admin-dashboard">
+  <header class="dashboard-header">
+    <div class="header-content">
+      <h1>{{ title() }} Admin</h1>
+      <nav class="main-nav">
+        <a routerLink="/users" routerLinkActive="active">Users</a>
+        <a routerLink="/posts" routerLinkActive="active">Posts</a>
+        <a routerLink="/analytics" routerLinkActive="active">Analytics</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="dashboard-main">
+    <div class="dashboard-content">
+      <!-- This is where different pages will be displayed -->
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+</div>
