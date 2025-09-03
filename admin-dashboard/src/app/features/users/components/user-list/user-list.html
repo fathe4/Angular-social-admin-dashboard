@@ -1,164 +1,300 @@
-<div class="user-list-container">
-  <!-- Header Section -->
-  <div class="page-header">
-    <div class="header-content">
-      <h1>User Management</h1>
-      <p class="subtitle">Manage users, roles, and permissions</p>
+<!-- Loading Spinner -->
+<div *ngIf="loading()" class="flex flex-col items-center justify-center py-12 gap-4">
+  <p-progressSpinner></p-progressSpinner>
+  <p class="text-gray-600">Loading users...</p>
+</div>
+
+<!-- Error Message -->
+<div *ngIf="error()" class="p-6">
+  <p-card class="max-w-md mx-auto">
+    <div class="text-center space-y-4">
+      <i class="pi pi-exclamation-triangle text-red-500 text-4xl"></i>
+      <p class="text-gray-600">{{ error() }}</p>
+      <p-button 
+        label="Retry" 
+        icon="pi pi-refresh" 
+        (onClick)="loadUsers()">
+      </p-button>
     </div>
-    <div class="header-actions">
-      <button class="btn btn-primary" routerLink="/users/create">
-        <span class="icon">+</span>
-        Add New User
-      </button>
+  </p-card>
+</div>
+
+<!-- Users List Content -->
+<div *ngIf="!loading() && !error()" class="p-6 bg-gray-50 min-h-full">
+  <!-- Page Header -->
+  <div class="mb-6">
+    <div class="flex items-center justify-between">
+      <h1 class="text-2xl font-semibold text-gray-900 mb-0 m-0">Users Management</h1>
+      <p-button 
+        label="Add New User" 
+        icon="pi pi-plus" 
+        severity="primary">
+      </p-button>
     </div>
   </div>
 
-  <!-- Stats Cards -->
-  <div class="stats-grid">
-    <div class="stat-card">
-      <div class="stat-value">{{ totalUsers() }}</div>
-      <div class="stat-label">Total Users</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-value">{{ activeUsersCount }}</div>
-      <div class="stat-label">Active Users</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-value">{{ inactiveUsersCount }}</div>
-      <div class="stat-label">Inactive Users</div>
+  <!-- Filters Section -->
+  <div class="mb-6 bg-white rounded-lg shadow-sm pb-4">
+    <h3 class="text-lg font-medium text-gray-900 mb-4">Filters</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <!-- Global Search -->
+      <div class="">
+        <label class="block text-sm font-medium text-gray-700 mb-2">Search</label>
+        <p-iconfield iconPosition="left">
+          <p-inputicon>
+            <i class="pi pi-search"></i>
+          </p-inputicon>
+          <input 
+            #globalFilter
+            pInputText 
+            type="text" 
+            [(ngModel)]="filterState.search"
+            (input)="onSearchChange($event.target.value)" 
+            placeholder="Search users..." 
+            class="w-full" />
+        </p-iconfield>
+      </div>
+
+      <!-- Role Filter -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Role</label>
+        <p-select 
+          #roleFilter
+          [options]="roleOptions" 
+          [(ngModel)]="filterState.role"
+          (onChange)="onRoleChange($event.value)" 
+          placeholder="All Roles"
+          [showClear]="true"
+          optionLabel="label"
+          optionValue="value"
+          class="w-full">
+        </p-select>
+      </div>
+
+      <!-- Status Filter -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+        <p-select 
+          #statusFilter
+          [options]="statusOptions" 
+          [(ngModel)]="filterState.status"
+          (onChange)="onStatusChange($event.value)" 
+          placeholder="All Statuses"
+          [showClear]="true"
+          optionLabel="label"
+          optionValue="value"
+          class="w-full">
+        </p-select>
+      </div>
+
+      <!-- Location Filter -->
+      <div class="hidden lg:block">
+        <label class="block text-sm font-medium text-gray-700 mb-2">Location</label>
+        <p-select 
+          #locationFilter
+          [options]="countryOptions" 
+          [(ngModel)]="filterState.location"
+          (onChange)="onLocationChange($event.value)" 
+          placeholder="All Locations"
+          [showClear]="true"
+          optionLabel="label"
+          optionValue="value"
+          class="w-full">
+        </p-select>
+      </div>
+
+      <!-- Clear All Filters Button -->
+      <div class="flex items-end">
+        <p-button 
+          label="Clear All" 
+          icon="pi pi-filter-slash" 
+          severity="secondary"
+          [outlined]="true"
+          (onClick)="clearAllFilters()"
+          class="w-full">
+        </p-button>
+      </div>
     </div>
   </div>
 
-  <!-- Loading State -->
-  <div *ngIf="loading()" class="loading-container">
-    <div class="spinner"></div>
-    <p>Loading users...</p>
-  </div>
+  <!-- PrimeNG Table -->
+  <div class="bg-white rounded-lg shadow-sm">
+    <p-table 
+      #dt
+      [value]="users()" 
+      dataKey="id"
+      [loading]="loading()"
+      styleClass="p-datatable-sm"
+      responsiveLayout="stack"
+      [breakpoint]="'768px'"
+      [scrollable]="false">
 
-  <!-- Error State -->
-  <div *ngIf="error()" class="error-container">
-    <div class="error-message">
-      <span class="error-icon">⚠️</span>
-      {{ error() }}
-    </div>
-    <button class="btn btn-secondary" (click)="loadUsers()">Try Again</button>
-  </div>
 
-  <!-- Users Table -->
-  <div *ngIf="!loading() && !error()" class="table-container">
-    <table class="users-table">
-      <thead>
+
+      <!-- Table Header -->
+      <ng-template #header>
         <tr>
-          <th>User</th>
-          <th>Email</th>
-          <th>Role</th>
-          <th>Status</th>
-          <th>Last Login</th>
-          <th>Actions</th>
+          <th class="w-1/6">User</th>
+          <th class="w-1/6 hidden md:table-cell">Email</th>
+          <th class="w-1/12">Username</th>
+          <th class="w-20">Role</th>
+          <th class="w-20">Status</th>
+          <th class="w-24 hidden lg:table-cell">Location</th>
+          <th class="w-24 hidden lg:table-cell">Joined</th>
+          <th class="w-20">Actions</th>
         </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let user of users()" class="user-row">
-          <td class="user-info">
-            <div class="user-avatar">
-              <img 
-                [src]="user.profilePicture || '/assets/default-avatar.svg'" 
-                [alt]="user.firstName + ' ' + user.lastName"
-                onerror="this.src='/assets/default-avatar.svg'"
-              />
+
+      </ng-template>
+
+      <!-- Table Body -->
+      <ng-template #body let-user>
+        <tr>
+          <td>
+            <div class="flex items-center gap-3">
+              <p-avatar 
+                [image]="user.profile_picture" 
+                size="normal" 
+                shape="circle"
+                class="flex-shrink-0">
+              </p-avatar>
+              <div class="min-w-0 flex-1">
+                <div class="font-medium text-gray-900 truncate">{{ getFullName(user) }}</div>
+                <div class="text-sm text-gray-500 truncate md:hidden">{{ user.email }}</div>
+              </div>
             </div>
-            <div class="user-details">
-              <div class="user-name">{{ user.firstName }} {{ user.lastName }}</div>
-              <div class="username">{{ '@' + user.username }}</div>
-            </div>
           </td>
-          <td class="user-email">{{ user.email }}</td>
-          <td class="user-role">
-            <span class="role-badge" [class]="'role-' + user.role.name.toLowerCase()">
-              {{ user.role.name }}
-            </span>
+          <td class="hidden md:table-cell">
+            <span class="text-sm text-gray-600">{{ user.email }}</span>
           </td>
-          <td class="user-status">
-            <span class="status-badge" [class]="user.isActive ? 'status-active' : 'status-inactive'">
-              {{ user.isActive ? 'Active' : 'Inactive' }}
-            </span>
+          <td>
+            <span class="text-sm font-medium text-gray-900">{{ user.username }}</span>
           </td>
-          <td class="user-login">
-            <span *ngIf="user.lastLogin; else noLogin">
-              {{ user.lastLogin | date:'MMM d, y, h:mm a' }}
-            </span>
-            <ng-template #noLogin>
-              <span class="no-login">Never</span>
-            </ng-template>
+          <td>
+            <p-tag 
+              [value]="user.role" 
+              [severity]="getRoleSeverity(user.role)"
+              class="text-xs">
+            </p-tag>
           </td>
-          <td class="user-actions">
-            <div class="action-buttons">
-              <button 
-                class="btn btn-sm btn-secondary" 
+          <td>
+            <p-tag 
+              [value]="user.is_active ? 'Active' : 'Inactive'" 
+              [severity]="getStatusSeverity(user.is_active)"
+              class="text-xs">
+            </p-tag>
+          </td>
+          <td class="hidden lg:table-cell">
+            <span class="text-sm text-gray-600">{{ user.location }}</span>
+          </td>
+          <td class="hidden lg:table-cell">
+            <span class="text-sm text-gray-600">{{ formatDate(user.created_at) }}</span>
+          </td>
+          <td>
+            <div class="flex items-center gap-1">
+              <p-button 
+                icon="pi pi-eye" 
+                severity="info"
+                size="small"
+                [text]="true"
                 [routerLink]="['/users', user.id]"
-                title="View Details"
-              >
-                👁️
-              </button>
-              <button 
-                class="btn btn-sm btn-secondary" 
-                [routerLink]="['/users', user.id, 'edit']"
+                title="View User">
+              </p-button>
+              <p-button 
+                icon="pi pi-pencil" 
+                severity="warn"
+                size="small"
+                [text]="true"
+                (onClick)="editUser(user)"
                 title="Edit User"
-              >
-                ✏️
-              </button>
-              <button 
-                class="btn btn-sm" 
-                [class]="user.isActive ? 'btn-warning' : 'btn-success'"
-                (click)="toggleUserStatus(user)"
-                [title]="user.isActive ? 'Deactivate User' : 'Activate User'"
-              >
-                {{ user.isActive ? '🔒' : '🔓' }}
-              </button>
-              <button 
-                class="btn btn-sm btn-danger" 
-                (click)="deleteUser(user)"
+                class="hidden sm:inline-flex">
+              </p-button>
+              <p-button 
+                icon="pi pi-trash" 
+                severity="danger"
+                size="small"
+                [text]="true"
+                (onClick)="deleteUser(user)"
                 title="Delete User"
-              >
-                🗑️
-              </button>
+                class="hidden sm:inline-flex">
+              </p-button>
             </div>
           </td>
         </tr>
-      </tbody>
-    </table>
+      </ng-template>
 
-    <!-- Empty State -->
-    <div *ngIf="users().length === 0" class="empty-state">
-      <div class="empty-icon">👥</div>
-      <h3>No users found</h3>
-      <p>Get started by adding your first user to the system.</p>
-      <button class="btn btn-primary" routerLink="/users/create">Add First User</button>
-    </div>
-  </div>
-
-  <!-- Pagination -->
-  <div *ngIf="totalUsers() > pageSize()" class="pagination-container">
-    <div class="pagination-info">
-      Showing {{ paginationStart }} to 
-      {{ paginationEnd }} of {{ totalUsers() }} users
-    </div>
-    <div class="pagination-controls">
-      <button 
-        class="btn btn-secondary btn-sm" 
-        [disabled]="currentPage() === 1"
-        (click)="onPageChange(currentPage() - 1)"
-      >
-        Previous
-      </button>
-      <span class="page-info">Page {{ currentPage() }}</span>
-      <button 
-        class="btn btn-secondary btn-sm" 
-        [disabled]="currentPage() * pageSize() >= totalUsers()"
-        (click)="onPageChange(currentPage() + 1)"
-      >
-        Next
-      </button>
+      <!-- Empty State -->
+      <ng-template #emptymessage>
+        <tr>
+          <td colspan="8" class="text-center py-12">
+            <div class="space-y-3">
+              <i class="pi pi-users text-gray-400 text-4xl"></i>
+              <p class="text-gray-500">No users found</p>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+    
+    <!-- Custom Pagination -->
+    <div class="p-4 border-t border-gray-200 bg-gray-50">
+      <div class="flex items-center justify-between">
+        <!-- Page Info -->
+        <div class="text-sm text-gray-700">
+          Showing {{ paginationInfo.start }} to {{ paginationInfo.end }} of {{ paginationInfo.total }} results
+        </div>
+        
+        <!-- Pagination Controls -->
+        <div class="flex items-center gap-2">
+          <!-- Previous Button -->
+          <p-button 
+            icon="pi pi-chevron-left" 
+            [disabled]="paginationInfo.currentPage === 1"
+            (onClick)="previousPage()"
+            size="small"
+            [text]="true">
+          </p-button>
+          
+          <!-- Page Numbers -->
+          <div class="flex items-center gap-1">
+            <span *ngFor="let page of getVisiblePages()" class="min-w-[32px] text-center">
+              <p-button 
+                *ngIf="isNumber(page); else ellipsis"
+                [label]="page.toString()" 
+                [outlined]="page !== paginationInfo.currentPage"
+                [severity]="page === paginationInfo.currentPage ? 'primary' : 'secondary'"
+                (onClick)="goToPageSafe(page)"
+                size="small"
+                class="w-8 h-8">
+              </p-button>
+              <ng-template #ellipsis>
+                <span class="text-gray-400">...</span>
+              </ng-template>
+            </span>
+          </div>
+          
+          <!-- Next Button -->
+          <p-button 
+            icon="pi pi-chevron-right" 
+            [disabled]="paginationInfo.currentPage === paginationInfo.totalPages"
+            (onClick)="nextPage()"
+            size="small"
+            [text]="true">
+          </p-button>
+        </div>
+        
+        <!-- Items per page -->
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-gray-700">Show:</span>
+          <p-select 
+            [options]="pageSizeOptions" 
+            [(ngModel)]="paginationInfo.pageSize"
+            (onChange)="onPageSizeChange($event.value)"
+            optionLabel="label"
+            optionValue="value"
+            class="w-20">
+          </p-select>
+        </div>
+      </div>
     </div>
   </div>
 </div>
