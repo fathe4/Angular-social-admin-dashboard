@@ -1,0 +1,205 @@
+<!-- Mobile Backdrop Overlay -->
+<div 
+  *ngIf="isOpen()"
+  class="mobile-backdrop"
+  (click)="onBackdropClick()"
+  role="button"
+  aria-label="Close sidebar"
+></div>
+
+<!-- Sidebar Container -->
+<aside 
+  class="sidebar"
+  [class.sidebar-open]="isOpen()"
+  (click)="onSidebarClick($event)"
+  role="navigation" 
+  aria-label="Main navigation"
+>
+  <!-- Header -->
+  <div class="sidebar-header">
+    <div class="flex items-center gap-3">
+      <!-- Rocket/Spike Icon -->
+      <div class="icon-container" role="img" aria-label="Spike Admin logo">
+        <mat-icon class="header-icon">rocket_launch</mat-icon>
+      </div>
+      <h1 class="header-title">Spike Admin</h1>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="sidebar-nav" aria-label="Navigation menu">
+    <!-- Main Section (no header) -->
+    <div class="nav-section">
+      <a 
+        [routerLink]="'/users'" 
+        routerLinkActive="active"
+        class="nav-item"
+        matTooltip="Manage users and permissions"
+        matTooltipPosition="right"
+        (click)="onNavItemClick()"
+      >
+        <mat-icon class="nav-icon">people</mat-icon>
+        <span class="nav-label">Users</span>
+      </a>
+    </div>
+
+    <!-- Pages Section -->
+    <div class="nav-section">
+      <h2 class="section-header">PAGES</h2>
+      <a 
+        [routerLink]="'/roll-base-access'" 
+        routerLinkActive="active"
+        class="nav-item"
+        (click)="onNavItemClick()"
+      >
+        <mat-icon class="nav-icon">key</mat-icon>
+        <span class="nav-label">Roll Base Access</span>
+        <span class="pro-badge">PRO</span>
+      </a>
+      
+      <a 
+        [routerLink]="'/treeview'" 
+        routerLinkActive="active"
+        class="nav-item"
+        (click)="onNavItemClick()"
+      >
+        <mat-icon class="nav-icon">account_tree</mat-icon>
+        <span class="nav-label">Treeview</span>
+      </a>
+      
+      <a 
+        [routerLink]="'/pricing'" 
+        routerLinkActive="active"
+        class="nav-item"
+        (click)="onNavItemClick()"
+      >
+        <mat-icon class="nav-icon">attach_money</mat-icon>
+        <span class="nav-label">Pricing</span>
+      </a>
+      
+      <a 
+        [routerLink]="'/account-settings'" 
+        routerLinkActive="active"
+        class="nav-item"
+        (click)="onNavItemClick()"
+      >
+        <mat-icon class="nav-icon">settings</mat-icon>
+        <span class="nav-label">Account Setting</span>
+      </a>
+      
+      <a 
+        [routerLink]="'/faq'" 
+        routerLinkActive="active"
+        class="nav-item"
+        (click)="onNavItemClick()"
+      >
+        <mat-icon class="nav-icon">help_outline</mat-icon>
+        <span class="nav-label">FAQ</span>
+      </a>
+      
+      <a 
+        [routerLink]="'/landing'" 
+        routerLinkActive="active"
+        class="nav-item"
+        (click)="onNavItemClick()"
+      >
+        <mat-icon class="nav-icon">description</mat-icon>
+        <span class="nav-label">Landingpage</span>
+      </a>
+    </div>
+
+    <!-- Widgets Section -->
+    <div class="nav-section">
+      <button 
+        class="nav-item expandable-item"
+        (click)="toggleWidgets()"
+        [attr.aria-expanded]="isWidgetsExpanded()"
+        aria-controls="widgets-submenu"
+        aria-label="Widgets menu toggle"
+      >
+        <mat-icon class="nav-icon">widgets</mat-icon>
+        <span class="nav-label">Widgets</span>
+        <mat-icon class="expand-icon" [class.expanded]="isWidgetsExpanded()">
+          keyboard_arrow_down
+        </mat-icon>
+      </button>
+      
+      <div 
+        *ngIf="isWidgetsExpanded()" 
+        class="submenu" 
+        id="widgets-submenu" 
+        role="group" 
+        aria-label="Widgets submenu"
+      >
+        <a 
+          [routerLink]="'/widgets/charts'" 
+          routerLinkActive="active"
+          class="nav-item submenu-item"
+          (click)="onNavItemClick()"
+        >
+          <mat-icon class="nav-icon">bar_chart</mat-icon>
+          <span class="nav-label">Charts</span>
+        </a>
+        
+        <a 
+          [routerLink]="'/widgets/tables'" 
+          routerLinkActive="active"
+          class="nav-item submenu-item"
+          (click)="onNavItemClick()"
+        >
+          <mat-icon class="nav-icon">table_view</mat-icon>
+          <span class="nav-label">Tables</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Extra Section -->
+    <div class="nav-section">
+      <h2 class="section-header">EXTRA</h2>
+      <a 
+        [routerLink]="'/icons'" 
+        routerLinkActive="active"
+        class="nav-item"
+        (click)="onNavItemClick()"
+      >
+        <mat-icon class="nav-icon">category</mat-icon>
+        <span class="nav-label">Icons</span>
+      </a>
+      
+      <a 
+        [routerLink]="'/sample-page'" 
+        routerLinkActive="active"
+        class="nav-item"
+        (click)="onNavItemClick()"
+      >
+        <mat-icon class="nav-icon">article</mat-icon>
+        <span class="nav-label">Sample Page</span>
+      </a>
+    </div>
+
+    <!-- Forms Section -->
+    <div class="nav-section">
+      <h2 class="section-header">FORMS</h2>
+      <a 
+        [routerLink]="'/forms/basic'" 
+        routerLinkActive="active"
+        class="nav-item"
+        (click)="onNavItemClick()"
+      >
+        <mat-icon class="nav-icon">edit_note</mat-icon>
+        <span class="nav-label">Basic Forms</span>
+      </a>
+      
+      <a 
+        [routerLink]="'/forms/advanced'" 
+        routerLinkActive="active"
+        class="nav-item"
+        (click)="onNavItemClick()"
+      >
+        <mat-icon class="nav-icon">dynamic_form</mat-icon>
+        <span class="nav-label">Advanced Forms</span>
+        <span class="pro-badge">PRO</span>
+      </a>
+    </div>
+  </nav>
+</aside>

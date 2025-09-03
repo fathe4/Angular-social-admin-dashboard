@@ -1,20 +1,40 @@
-<!-- Social Media Admin Dashboard -->
-<div class="admin-dashboard">
-  <header class="dashboard-header">
-    <div class="header-content">
-      <h1>{{ title() }} Admin</h1>
-      <nav class="main-nav">
-        <a routerLink="/users" routerLinkActive="active">Users</a>
-        <a routerLink="/posts" routerLinkActive="active">Posts</a>
-        <a routerLink="/analytics" routerLinkActive="active">Analytics</a>
-      </nav>
-    </div>
-  </header>
+<!-- Modern Admin Dashboard with Spike Sidebar -->
+<div class="modern-dashboard">
+  <!-- Top Toolbar -->
+  <mat-toolbar color="primary" class="dashboard-toolbar">
+    <button mat-icon-button class="menu-button" (click)="toggleSidebar()">
+      <mat-icon>menu</mat-icon>
+    </button>
+    
+    <span class="toolbar-title">
+      <mat-icon>admin_panel_settings</mat-icon>
+      {{ title() }} Admin Dashboard
+    </span>
+    
+    <span class="toolbar-spacer"></span>
+    
+    <button mat-icon-button class="profile-button">
+      <mat-icon>account_circle</mat-icon>
+    </button>
+  </mat-toolbar>
 
-  <main class="dashboard-main">
-    <div class="dashboard-content">
-      <!-- This is where different pages will be displayed -->
-      <router-outlet></router-outlet>
-    </div>
-  </main>
+  <!-- Main Layout Container -->
+  <div class="dashboard-layout">
+    <!-- Modern Sidebar -->
+    <app-sidebar 
+      class="sidebar-container" 
+      [isOpen]="isSidebarOpen()"
+      (sidebarClose)="closeSidebar()"
+    ></app-sidebar>
+    
+    <!-- Main Content Area -->
+    <main class="main-content">
+       <div class="breadcrumb-container">
+        <app-breadcrumb></app-breadcrumb>
+      </div>
+      <div class="content-wrapper">
+        <router-outlet></router-outlet>
+      </div>
+    </main>
+  </div>
 </div>
