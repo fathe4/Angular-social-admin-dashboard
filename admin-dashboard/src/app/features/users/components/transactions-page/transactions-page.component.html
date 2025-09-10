@@ -1,0 +1,105 @@
+<div class="w-full">
+  <!-- Page Header -->
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-gray-900 mb-2">Transactions</h1>
+    <p class="text-gray-600">Manage and monitor all platform transactions</p>
+  </div>
+
+  <!-- Filters Card -->
+  <p-card class="mb-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <!-- Search Input -->
+
+      <!-- Status Filter -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+        <p-select 
+          [options]="statusOptions" 
+          [(ngModel)]="statusFilter" 
+          (ngModelChange)="onFilterChange()"
+          [checkmark]="true" 
+          optionLabel="name" 
+          [showClear]="true" 
+          placeholder="Select Status" 
+          class="w-full"
+        />
+      </div>
+
+      <!-- Payment Method Filter -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Payment Method</label>
+        <p-select 
+          [options]="paymentMethodOptions" 
+          [(ngModel)]="paymentMethodFilter" 
+          (ngModelChange)="onFilterChange()"
+          [checkmark]="true" 
+          optionLabel="name" 
+          [showClear]="true" 
+          placeholder="Select Payment Method" 
+          class="w-full"
+        />
+      </div>
+
+      <!-- Reference Type Filter -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Reference Type</label>
+        <p-select 
+          [options]="referenceTypeOptions" 
+          [(ngModel)]="referenceTypeFilter" 
+          (ngModelChange)="onFilterChange()"
+          [checkmark]="true" 
+          optionLabel="name" 
+          [showClear]="true" 
+          placeholder="Select Reference Type" 
+          class="w-full"
+        />
+      </div>
+    </div>
+
+    <!-- Date Range Filter -->
+    <div class="mt-4">
+      <label class="block text-sm font-medium text-gray-700 mb-2">Date Range</label>
+      <div class="flex gap-4 items-end">
+        <div class="flex-1">
+          <div class="flex gap-2">
+            <p-datepicker 
+              [(ngModel)]="startDate" 
+              (ngModelChange)="onFilterChange()"
+              placeholder="Start Date" 
+              class="flex-1"
+            />
+            <p-datepicker 
+              [(ngModel)]="endDate" 
+              (ngModelChange)="onFilterChange()"
+              placeholder="End Date" 
+              class="flex-1"
+            />
+          </div>
+        </div>
+        <p-button
+          label="Clear Filters"
+          icon="pi pi-filter-slash"
+          severity="secondary"
+          size="small"
+          (onClick)="clearFilters()"
+        ></p-button>
+      </div>
+    </div>
+  </p-card>
+
+  <!-- Transactions Table -->
+  <p-card>
+    <app-transaction-table
+      [transactions]="(transactions$ | async) || []"
+      [showUserColumn]="true"
+      [showPaginator]="true"
+      [rowsPerPage]="10"
+      [loading]="loading"
+      (transactionClick)="onTransactionClick($event)"
+      (userClick)="onUserClick($event)"
+    ></app-transaction-table>
+  </p-card>
+
+  <!-- Toast for notifications -->
+  <p-toast></p-toast>
+</div>

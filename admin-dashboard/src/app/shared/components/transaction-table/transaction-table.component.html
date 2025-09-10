@@ -1,0 +1,62 @@
+<p-table 
+  [value]="transactions" 
+  [tableStyle]="{ 'min-width': '50rem' }" 
+  size="large"
+  [paginator]="showPaginator"
+  [rows]="rowsPerPage"
+  [showCurrentPageReport]="showPaginator"
+  currentPageReportTemplate="Showing {first} to {last} of {totalRecords} transactions"
+  [loading]="loading"
+>
+  <ng-template #header>
+    <tr>
+      <th>Transaction ID</th>
+      <th *ngIf="showUserColumn">User ID</th>
+      <th>Reference Type</th>
+      <th>Amount</th>
+      <th>Payment Method</th>
+      <th>Status</th>
+      <th>Created At</th>
+      <th>Completed At</th>
+    </tr>
+  </ng-template>
+  <ng-template #body let-transaction>
+    <tr (click)="onTransactionClick(transaction)" class="cursor-pointer hover:bg-gray-50">
+      <td>
+        <span class="font-mono text-sm">{{ truncateId(transaction.id) }}</span>
+      </td>
+      <td *ngIf="showUserColumn">
+        <a 
+          routerLink="/dashboard/users/{{ transaction.user_id }}/transactions"
+          class="font-mono text-sm text-blue-600 hover:text-blue-800 hover:underline cursor-pointer"
+        >
+          {{ truncateId(transaction.user_id) }}
+        </a>
+      </td>
+      <td>
+        <p-tag
+          [value]="transaction.reference_type"
+          [severity]="getReferenceTypeSeverity(transaction.reference_type)"
+        ></p-tag>
+      </td>
+      <td>
+        <span class="font-semibold">{{ formatAmount(transaction.amount, transaction.currency) }}</span>
+      </td>
+      <td>
+        <span class="capitalize">{{ transaction.payment_method }}</span>
+      </td>
+      <td>
+        <p-tag
+          [value]="transaction.status"
+          [severity]="getStatusSeverity(transaction.status)"
+        ></p-tag>
+      </td>
+      <td>
+        <span class="text-sm">{{ formatDate(transaction.created_at) }}</span>
+      </td>
+      <td>
+        <span class="text-sm">{{ formatDate(transaction.completed_at) }}</span>
+      </td>
+    </tr>
+  </ng-template>
+</p-table>

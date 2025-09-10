@@ -1,0 +1,22 @@
+<p-table [value]="subscriptions" [tableStyle]="{ 'min-width': '50rem' }" size="large">
+    <ng-template #header>
+        <tr>
+            <th>Tier Name</th>
+            <th>Price</th>
+            <th>Duration Days</th>
+            <th>Status</th>
+            <th>Started At</th>
+            <th>Expires At</th>
+        </tr>
+    </ng-template>
+    <ng-template #body let-subscription>
+        <tr>
+            <td>{{ subscription.subscription_tier.name }}</td>
+            <td>{{ subscription.subscription_tier.price }}</td>
+            <td>{{ subscription.subscription_tier.duration_days }}</td>
+            <td>{{ subscription.status }}</td>
+            <td>{{ subscription.started_at }}</td>
+            <td>{{ subscription.expires_at }}</td>
+        </tr>
+    </ng-template>
+</p-table>

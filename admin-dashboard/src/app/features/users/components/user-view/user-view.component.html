@@ -1,0 +1,125 @@
+<!-- User Profile Header -->
+<div class="w-full flex flex-col md:flex-row gap-8 my-6">
+  <!-- Profile Card -->
+  <div class="w-full md:w-1/3">
+    <p-card class="shadow-md rounded-2xl border border-gray-200">
+      <div class="flex flex-col gap-6">
+        
+        <!-- Avatar + Basic Info + Actions -->
+        <div class="flex justify-between items-start">
+          <div class="flex gap-4 items-center">
+            <p-avatar
+              [image]="user?.profile_picture"
+              size="xlarge"
+              shape="circle"
+            ></p-avatar>
+
+            <div>
+              <h2 class="m-0 text-xl font-semibold text-gray-900">
+                {{ user?.first_name }} {{ user?.last_name }}
+              </h2>
+              <p class="m-0 text-gray-500 text-sm">@{{ user?.username }}</p>
+              
+              <div class="flex flex-wrap gap-2 mt-2">
+                <p-tag
+                  [value]="user?.role"
+                  [severity]="getRoleBadgeSeverity(user?.role!)"
+                ></p-tag>
+                <p-tag
+                  [value]="user?.is_active ? 'Active' : 'Inactive'"
+                  [severity]="getStatusBadgeSeverity(user?.is_active!)"
+                ></p-tag>
+                <p-tag
+                  [value]="user?.is_verified ? 'Verified' : 'Unverified'"
+                  [severity]="getVerificationBadgeSeverity(user?.is_verified!)"
+                ></p-tag>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex gap-2">
+            <p-button
+              icon="pi pi-trash"
+              severity="danger"
+              size="small"
+              rounded
+              (onClick)="onDeleteUser()"
+            ></p-button>
+          </div>
+        </div>
+
+        <!-- Contact Info + Join Date -->
+        <div class="flex flex-col gap-6 border-t pt-4">
+          <!-- Contact Info -->
+          <div>
+            <h5 class="text-gray-900 font-semibold text-base mb-3">
+              Contact Information
+            </h5>
+            <div class="grid text-sm">
+              <div class="col-12 md:col-6 flex items-center gap-2 mb-2" *ngIf="user?.email">
+                <i class="pi pi-envelope text-gray-500"></i>
+                <span>{{ user.email }}</span>
+              </div>
+              <div class="col-12 md:col-6 flex items-center gap-2 mb-2" *ngIf="user?.contact_info?.phone">
+                <i class="pi pi-phone text-gray-500"></i>
+                <span>{{ user.contact_info.phone }}</span>
+              </div>
+              <div class="col-12 md:col-6 flex items-center gap-2 mb-2" *ngIf="user?.location">
+                <i class="pi pi-map-marker text-gray-500"></i>
+                <span>{{ user.location }}</span>
+              </div>
+              <div class="col-12 md:col-6 flex items-center gap-2 mb-2" *ngIf="user?.contact_info?.website">
+                <i class="pi pi-globe text-gray-500"></i>
+                <a
+                  [href]="user.contact_info.website"
+                  target="_blank"
+                  class="text-primary hover:underline"
+                >
+                  {{ getWebsiteDomain(user.contact_info.website) }}
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Join Date -->
+          <div *ngIf="user?.join_date">
+            <h5 class="text-gray-900 font-semibold text-base mb-3">
+              Member Since
+            </h5>
+            <div class="flex items-center gap-2 text-sm">
+              <i class="pi pi-calendar text-gray-500"></i>
+              <span>{{ formatJoinDate(user.join_date) }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </p-card>
+  </div>
+
+  <!-- Content Section -->
+  <div class="w-full md:w-2/3">
+    <div class="mb-4">
+      <p-tabs>
+        <p-tablist>
+          <div class="flex justify-center flex-row gap-2">
+            @for(tab of tabs; track tab.id) {
+              <p-tab
+                [value]="tab.id"
+                [routerLink]="tab.route"
+                routerLinkActive="p-highlight"
+                class="flex gap-2 items-center text-gray-700 hover:text-primary transition"
+              >
+                <i [class]="tab.icon"></i>
+                <span>{{ tab.label }}</span>
+              </p-tab>
+            }
+          </div>
+        </p-tablist>
+      </p-tabs>
+    </div>
+
+    <div class="mt-6">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+</div>

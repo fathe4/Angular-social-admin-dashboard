@@ -1,0 +1,10 @@
+<app-boosted-posts-table
+  [boostedPosts]="postBoost"
+  [showUserColumn]="false"
+  [showLocationColumn]="true"
+  [showPaginator]="false"
+  [showRefreshButton]="true"
+  (postClick)="onPostClick($event)"
+  (userClick)="onUserClick($event)"
+  (refreshClick)="onRefreshClick()"
+></app-boosted-posts-table>

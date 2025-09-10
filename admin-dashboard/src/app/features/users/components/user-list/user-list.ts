@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { UserService } from '../../services/user.service';
 import { User, UserRole } from '../../models/user.model';
-import { demoUsers } from '../../Mock/user.mock';
 import { FormsModule } from '@angular/forms';
 
 // PrimeNG Modules
@@ -107,70 +106,40 @@ export class UserList implements OnInit {
     this.loading.set(true);
     this.error.set(null);
 
-    try {
-      // In a real app, this would be an API call with filters and pagination
-      const params = {
-        page: this.paginationInfo.currentPage,
-        pageSize: this.paginationInfo.pageSize,
-        search: this.filterState.search,
-        role: this.filterState.role,
-        status: this.filterState.status,
-        location: this.filterState.location,
-      };
+    // Prepare API parameters
+    const is_active = this.filterState.status !== null ? this.filterState.status : undefined;
+    const role = this.filterState.role || undefined;
+    const search = this.filterState.search || undefined;
 
-      // Simulate server-side filtering and pagination
-      setTimeout(() => {
-        const filteredUsers = this.applyServerSideFilters(demoUsers);
-        const startIndex = (this.paginationInfo.currentPage - 1) * this.paginationInfo.pageSize;
-        const endIndex = startIndex + this.paginationInfo.pageSize;
-        const paginatedUsers = filteredUsers.slice(startIndex, endIndex);
-
-        this.users.set(paginatedUsers);
-        this.updatePaginationInfo(filteredUsers.length);
-        this.loading.set(false);
-      }, 500); // Simulate API delay
-    } catch (err) {
-      this.error.set('Failed to load users');
-      this.loading.set(false);
-    }
+    this.userService
+      .getUsers(
+        this.paginationInfo.currentPage,
+        this.paginationInfo.pageSize,
+        search,
+        role,
+        undefined, // is_verified
+        is_active,
+        'created_at', // sort_by
+        'desc' // order
+      )
+      .subscribe({
+        next: (response) => {
+          this.users.set(response.users);
+          this.updatePaginationInfo(response.total);
+          this.loading.set(false);
+        },
+        error: (error) => {
+          console.error('Error loading users:', error);
+          this.error.set(error.message || 'Failed to load users');
+          this.loading.set(false);
+        },
+      });
   }
 
-  private applyServerSideFilters(allUsers: User[]): User[] {
-    let filtered = [...allUsers];
-
-    // Apply search filter
-    if (this.filterState.search) {
-      const searchLower = this.filterState.search.toLowerCase();
-      filtered = filtered.filter(
-        (user) =>
-          user.first_name.toLowerCase().includes(searchLower) ||
-          user.last_name.toLowerCase().includes(searchLower) ||
-          user.email.toLowerCase().includes(searchLower) ||
-          user.username.toLowerCase().includes(searchLower)
-      );
-    }
-
-    // Apply role filter
-    if (this.filterState.role !== null) {
-      filtered = filtered.filter((user) => user.role === this.filterState.role);
-    }
-
-    // Apply status filter
-    if (this.filterState.status !== null) {
-      filtered = filtered.filter((user) => user.is_active === this.filterState.status);
-    }
-
-    // Apply location filter
-    if (this.filterState.location) {
-      filtered = filtered.filter((user) => user.location === this.filterState.location);
-    }
-
-    return filtered;
-  }
-
-  private updatePaginationInfo(totalItems: number): void {
+  private updatePaginationInfo(totalItems: number, totalPages?: number): void {
     this.paginationInfo.total = totalItems;
-    this.paginationInfo.totalPages = Math.ceil(totalItems / this.paginationInfo.pageSize);
+    this.paginationInfo.totalPages =
+      totalPages || Math.ceil(totalItems / this.paginationInfo.pageSize);
     this.paginationInfo.start =
       (this.paginationInfo.currentPage - 1) * this.paginationInfo.pageSize + 1;
     this.paginationInfo.end = Math.min(
