@@ -31,7 +31,7 @@
     <!-- Main Section (no header) -->
     <div class="nav-section">
       <a 
-        [routerLink]="'/users'" 
+        [routerLink]="'/dashboard/users'" 
         routerLinkActive="active"
         class="nav-item"
         matTooltip="Manage users and permissions"
@@ -41,10 +41,45 @@
         <mat-icon class="nav-icon">people</mat-icon>
         <span class="nav-label">Users</span>
       </a>
+      
+      <a 
+        [routerLink]="'/dashboard/transactions'" 
+        routerLinkActive="active"
+        class="nav-item"
+        matTooltip="View and manage all transactions"
+        matTooltipPosition="right"
+        (click)="onNavItemClick()"
+      >
+        <mat-icon class="nav-icon">account_balance_wallet</mat-icon>
+        <span class="nav-label">Transactions</span>
+      </a>
+      
+      <a 
+        [routerLink]="'/dashboard/boosted-posts'" 
+        routerLinkActive="active"
+        class="nav-item"
+        matTooltip="View and manage all boosted posts"
+        matTooltipPosition="right"
+        (click)="onNavItemClick()"
+      >
+        <mat-icon class="nav-icon">trending_up</mat-icon>
+        <span class="nav-label">Boosted Posts</span>
+      </a>
+      <a 
+        [routerLink]="'/dashboard/boosted-posts'" 
+        routerLinkActive="active"
+        class="nav-item"
+        matTooltip="View and manage all boosted posts"
+        matTooltipPosition="right"
+        (click)="onNavItemClick()"
+      >
+        <mat-icon class="nav-icon">logout</mat-icon>
+        <span class="nav-label">Logout</span>
+      </a>
     </div>
 
     <!-- Pages Section -->
-    <div class="nav-section">
+    <!-- <div class="nav-section">
       <h2 class="section-header">PAGES</h2>
       <a 
         [routerLink]="'/roll-base-access'" 
@@ -106,10 +141,10 @@
         <mat-icon class="nav-icon">description</mat-icon>
         <span class="nav-label">Landingpage</span>
       </a>
-    </div>
+    </div> -->
 
     <!-- Widgets Section -->
-    <div class="nav-section">
+    <!-- <div class="nav-section">
       <button 
         class="nav-item expandable-item"
         (click)="toggleWidgets()"
@@ -151,10 +186,10 @@
           <span class="nav-label">Tables</span>
         </a>
       </div>
-    </div>
+    </div> -->
 
     <!-- Extra Section -->
-    <div class="nav-section">
+    <!-- <div class="nav-section">
       <h2 class="section-header">EXTRA</h2>
       <a 
         [routerLink]="'/icons'" 
@@ -175,10 +210,10 @@
         <mat-icon class="nav-icon">article</mat-icon>
         <span class="nav-label">Sample Page</span>
       </a>
-    </div>
+    </div> -->
 
     <!-- Forms Section -->
-    <div class="nav-section">
+    <!-- <div class="nav-section">
       <h2 class="section-header">FORMS</h2>
       <a 
         [routerLink]="'/forms/basic'" 
@@ -200,6 +235,6 @@
         <span class="nav-label">Advanced Forms</span>
         <span class="pro-badge">PRO</span>
       </a>
-    </div>
+    </div> -->
   </nav>
 </aside>

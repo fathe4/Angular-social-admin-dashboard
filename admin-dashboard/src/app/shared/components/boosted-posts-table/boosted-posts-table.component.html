@@ -1,0 +1,111 @@
+<div class="card">
+  <p-table 
+    [value]="boostedPosts" 
+    [tableStyle]="{ 'min-width': '50rem' }" 
+    size="large"
+    [paginator]="showPaginator"
+    [rows]="rowsPerPage"
+    [showCurrentPageReport]="showPaginator"
+    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} boosted posts"
+    [loading]="loading"
+  >
+    <!-- Table Caption -->
+    <ng-template pTemplate="caption">
+      <div class="flex items-center justify-between">
+        <span class="text-xl font-bold">Boosted Posts</span>
+        <p-button 
+          *ngIf="showRefreshButton"
+          icon="pi pi-refresh" 
+          rounded 
+          raised 
+          (onClick)="onRefreshClick()"
+        />
+      </div>
+    </ng-template>
+
+    <!-- Table Header -->
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Picture</th>
+        <th>Post ID</th>
+        <th *ngIf="showUserColumn">User</th>
+        <th>Content</th>
+        <th>Duration</th>
+        <th>Amount</th>
+        <th>Status</th>
+        <th>Time Left</th>
+        <th *ngIf="showLocationColumn">Location</th>
+        <th>Created At</th>
+      </tr>
+    </ng-template>
+
+    <!-- Table Body -->
+    <ng-template pTemplate="body" let-post>
+      <tr (click)="onPostClick(post)" class="cursor-pointer hover:bg-gray-50">
+        <td>
+          <img 
+            [src]="getPostMedia(post)" 
+            [alt]="getPostContent(post)" 
+            class="w-16 h-16 rounded object-cover"
+            loading="lazy"
+            (error)="onImageError($event)"
+          />
+        </td>
+        <td>
+          <span class="font-mono text-sm">{{ truncateText(post.post_id, 8) }}</span>
+        </td>
+        <td *ngIf="showUserColumn">
+          <div class="flex items-center gap-2">
+            <img 
+              [src]="getUserProfilePicture(post)" 
+              [alt]="getUserName(post)"
+              class="w-6 h-6 rounded-full object-cover"
+              (error)="onUserImageError($event)"
+            />
+            <span 
+              class="text-sm text-blue-600 hover:text-blue-800 hover:underline cursor-pointer"
+              (click)="onUserClick(post.user_id, $event)"
+            >
+              {{ truncateText(getUserName(post), 15) }}
+            </span>
+          </div>
+        </td>
+        <td>
+          <span class="font-medium">{{ truncateText(getPostContent(post), 30) }}</span>
+        </td>
+        <td>
+          <span class="text-sm">{{ post.days }} days</span>
+        </td>
+        <td>
+          <span class="font-semibold text-green-600">{{ formatPrice(post.amount) }}</span>
+        </td>
+        <td>
+          <p-tag 
+            [value]="post.status" 
+            [severity]="getStatusSeverity(post.status)" 
+          />
+        </td>
+        <td>
+          <span class="text-sm" [class]="post.status.toLowerCase() === 'expired' ? 'text-red-500' : 'text-gray-700'">
+            {{ getTimeLeft(post.expires_at) }}
+          </span>
+        </td>
+        <td *ngIf="showLocationColumn">
+          <span class="text-sm">{{ truncateText(getLocation(post), 20) }}</span>
+        </td>
+        <td>
+          <span class="text-sm">{{ formatDate(post.created_at || '') }}</span>
+        </td>
+      </tr>
+    </ng-template>
+
+    <!-- Table Footer -->
+    <ng-template pTemplate="footer">
+      <tr>
+        <td [attr.colspan]="showUserColumn && showLocationColumn ? 10 : showUserColumn || showLocationColumn ? 9 : 8">
+          Total: {{ boostedPosts.length }} boosted posts
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

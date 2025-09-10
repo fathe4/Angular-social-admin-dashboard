@@ -1,0 +1,10 @@
+
+
+<app-transaction-table
+  [transactions]="(transactions$ | async) || []"
+  [showUserColumn]="false"
+  [showPaginator]="false"
+  [loading]="loading"
+  (transactionClick)="onTransactionClick($event)"
+  (userClick)="onUserClick($event)"
+></app-transaction-table>

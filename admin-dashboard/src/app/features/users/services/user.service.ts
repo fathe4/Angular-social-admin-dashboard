@@ -1,62 +1,215 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { User, UserListResponse, CreateUserRequest, UpdateUserRequest } from '../models/user.model';
+import { map, catchError, switchMap } from 'rxjs/operators';
+import { throwError } from 'rxjs';
+import {
+  User,
+  UserListResponse,
+  CreateUserRequest,
+  UpdateUserRequest,
+  UserRole,
+  UsersListResponse,
+} from '../models/user.model';
+import { environment } from '../../../../environments/environment';
+
+// interface BackendUserResponse {
+//   status: string;
+//   results: number;
+//   total: number;
+//   page: number;
+//   totalPages: number;
+//   data: {
+//     users: any[];
+//   };
+// }
+
+interface BackendUserListResponse {
+  status: string;
+  results: number;
+  total: number;
+  page: number;
+  totalPages: number;
+  data: {
+    users: User[];
+  };
+}
+
+interface BackendSingleUserResponse {
+  status: string;
+  data: {
+    user: User;
+  };
+}
 
 @Injectable({
-  providedIn: 'root' // This makes it a singleton service
+  providedIn: 'root', // This makes it a singleton service
 })
 export class UserService {
   private readonly http = inject(HttpClient); // Modern Angular dependency injection
-  private readonly apiUrl = 'http://localhost:3000/api'; // Your backend URL
+  private readonly apiUrl = environment.apiUrl; // Use environment configuration
 
   /**
-   * Get all users with pagination
+   * Get all users with pagination, filtering and search
    */
-  getUsers(page: number = 1, limit: number = 10, search?: string): Observable<UserListResponse> {
-    let params = new HttpParams()
-      .set('page', page.toString())
-      .set('limit', limit.toString());
-    
+  getUsers(
+    page: number = 1,
+    limit: number = 10,
+    search?: string,
+    role?: UserRole,
+    is_verified?: boolean,
+    is_active?: boolean,
+    sort_by?: string,
+    order?: 'asc' | 'desc'
+  ): Observable<UserListResponse> {
+    let params = new HttpParams().set('page', page.toString()).set('limit', limit.toString());
+
     if (search) {
       params = params.set('search', search);
     }
+    if (role) {
+      params = params.set('role', role);
+    }
+    if (is_verified !== undefined) {
+      params = params.set('is_verified', is_verified.toString());
+    }
+    if (is_active !== undefined) {
+      params = params.set('is_active', is_active.toString());
+    }
+    if (sort_by) {
+      params = params.set('sort_by', sort_by);
+    }
+    if (order) {
+      params = params.set('order', order);
+    }
 
-    return this.http.get<UserListResponse>(`${this.apiUrl}/users`, { params });
+    return this.http
+      .get<BackendUserListResponse>(`${this.apiUrl}${environment.endpoints.users.list}`, {
+        params,
+      })
+      .pipe(
+        map((response) => ({
+          users: response.data.users,
+          total: response.total,
+          page: response.page,
+          totalPages: response.totalPages,
+          limit: Math.ceil(response.total / response.results) || 10,
+        })),
+        catchError(this.handleError)
+      );
   }
 
   /**
    * Get a single user by ID
    */
   getUserById(id: string): Observable<User> {
-    return this.http.get<User>(`${this.apiUrl}/users/${id}`);
+    return this.http
+      .get<BackendSingleUserResponse>(`${this.apiUrl}${environment.endpoints.users.detail}/${id}`)
+      .pipe(
+        map((response) => response.data.user),
+        catchError(this.handleError)
+      );
   }
 
   /**
    * Create a new user
    */
   createUser(userData: CreateUserRequest): Observable<User> {
-    return this.http.post<User>(`${this.apiUrl}/users`, userData);
+    return this.http
+      .post<BackendSingleUserResponse>(
+        `${this.apiUrl}${environment.endpoints.users.create}`,
+        userData
+      )
+      .pipe(
+        map((response) => response.data.user),
+        catchError(this.handleError)
+      );
   }
 
   /**
    * Update an existing user
    */
   updateUser(id: string, userData: UpdateUserRequest): Observable<User> {
-    return this.http.patch<User>(`${this.apiUrl}/users/${id}`, userData);
+    return this.http
+      .patch<BackendSingleUserResponse>(
+        `${this.apiUrl}${environment.endpoints.users.update}/${id}`,
+        userData
+      )
+      .pipe(
+        map((response) => response.data.user),
+        catchError(this.handleError)
+      );
   }
 
   /**
    * Delete a user (soft delete)
    */
   deleteUser(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/users/${id}`);
+    return this.http
+      .delete<void>(`${this.apiUrl}${environment.endpoints.users.delete}/${id}`)
+      .pipe(catchError(this.handleError));
   }
 
   /**
    * Toggle user active status
    */
   toggleUserStatus(id: string): Observable<User> {
-    return this.http.patch<User>(`${this.apiUrl}/users/${id}/toggle-status`, {});
+    // Use update endpoint to toggle is_active status
+    return this.getUserById(id).pipe(
+      map((user) => ({ is_active: !user.is_active })),
+      switchMap((updateData) => this.updateUser(id, updateData))
+    );
+  }
+
+  /**
+   * Transform backend user list response to frontend format
+   */
+  // private transformUserListResponse(response: UsersListResponse): UserListResponse {
+  //   return {
+  //     users: response.data.users.map((user) => this.transformUser(user)),
+  //     total: response.total,
+  //     page: response.page,
+  //     totalPages: response.totalPages,
+  //     limit: Math.ceil(response.total / response.results) || 10,
+  //   };
+  // }
+
+  /**
+   * Transform backend user object to frontend User model
+   */
+  // private transformUser(backendUser: any): User {
+  //   return {
+  //     id: backendUser.id,
+  //     email: backendUser.email,
+  //     username: backendUser.username,
+  //     first_name: backendUser.first_name,
+  //     last_name: backendUser.last_name,
+  //     role: backendUser.role as UserRole,
+  //     is_verified: backendUser.is_verified,
+  //     is_active: backendUser.is_active,
+  //     created_at: backendUser.created_at,
+  //     updated_at: backendUser.updated_at,
+  //     profile_picture: backendUser.profile_picture,
+  //     settings: backendUser.settings,
+  //   };
+  // }
+
+  /**
+   * Handle HTTP errors
+   */
+  private handleError(error: any): Observable<never> {
+    console.error('UserService error:', error);
+
+    let errorMessage = 'An unexpected error occurred';
+
+    if (error.error?.message) {
+      errorMessage = error.error.message;
+    } else if (error.message) {
+      errorMessage = error.message;
+    } else if (typeof error === 'string') {
+      errorMessage = error;
+    }
+
+    return throwError(() => new Error(errorMessage));
   }
 }

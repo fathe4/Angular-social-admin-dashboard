@@ -1,9 +1,3 @@
-<!-- Loading Spinner -->
-<div *ngIf="loading()" class="flex flex-col items-center justify-center py-12 gap-4">
-  <p-progressSpinner></p-progressSpinner>
-  <p class="text-gray-600">Loading users...</p>
-</div>
-
 <!-- Error Message -->
 <div *ngIf="error()" class="p-6">
   <p-card class="max-w-md mx-auto">
@@ -20,7 +14,7 @@
 </div>
 
 <!-- Users List Content -->
-<div *ngIf="!loading() && !error()" class="p-6 bg-gray-50 min-h-full">
+<div *ngIf="!error()" class="p-6 bg-gray-50 min-h-full">
   <!-- Page Header -->
   <div class="mb-6">
     <div class="flex items-center justify-between">
@@ -129,8 +123,6 @@
       [breakpoint]="'768px'"
       [scrollable]="false">
 
-
-
       <!-- Table Header -->
       <ng-template #header>
         <tr>
@@ -196,17 +188,8 @@
                 severity="info"
                 size="small"
                 [text]="true"
-                [routerLink]="['/users', user.id]"
+                [routerLink]="['/dashboard/users', user.id]"
                 title="View User">
-              </p-button>
-              <p-button 
-                icon="pi pi-pencil" 
-                severity="warn"
-                size="small"
-                [text]="true"
-                (onClick)="editUser(user)"
-                title="Edit User"
-                class="hidden sm:inline-flex">
               </p-button>
               <p-button 
                 icon="pi pi-trash" 

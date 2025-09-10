@@ -9,6 +9,7 @@ export interface BaseModel {
 export enum UserRole {
   ADMIN = 'admin',
   MODERATOR = 'moderator',
+  SUPER_ADMIN = 'super_admin',
   USER = 'user',
 }
 
@@ -227,9 +228,11 @@ export interface UserWithProfileResponse {
   profile: Profile | null;
 }
 
-// For paginated users list
+// For paginated users list (backend response format)
 export interface UsersListResponse {
-  users: User[];
+  data: {
+    users: User[];
+  };
   total: number;
   page: number;
   limit: number;
@@ -267,4 +270,11 @@ export interface ApiSuccessResponse<T = any> {
   statusCode: number;
 }
 
-export type UserListResponse = UsersListResponse;
+// Frontend user list response (transformed from backend)
+export interface UserListResponse {
+  users: User[];
+  total: number;
+  page: number;
+  totalPages: number;
+  limit: number;
+}
