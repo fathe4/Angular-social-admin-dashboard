@@ -1,7 +1,6 @@
 <div class="card">
   <p-table 
     [value]="boostedPosts" 
-    [tableStyle]="{ 'min-width': '50rem' }" 
     size="large"
     [paginator]="showPaginator"
     [rows]="rowsPerPage"
@@ -26,7 +25,6 @@
     <!-- Table Header -->
     <ng-template pTemplate="header">
       <tr>
-        <th>Picture</th>
         <th>Post ID</th>
         <th *ngIf="showUserColumn">User</th>
         <th>Content</th>
@@ -42,7 +40,7 @@
     <!-- Table Body -->
     <ng-template pTemplate="body" let-post>
       <tr (click)="onPostClick(post)" class="cursor-pointer hover:bg-gray-50">
-        <td>
+        <!-- <td>
           <img 
             [src]="getPostMedia(post)" 
             [alt]="getPostContent(post)" 
@@ -50,7 +48,7 @@
             loading="lazy"
             (error)="onImageError($event)"
           />
-        </td>
+        </td> -->
         <td>
           <span class="font-mono text-sm">{{ truncateText(post.post_id, 8) }}</span>
         </td>
