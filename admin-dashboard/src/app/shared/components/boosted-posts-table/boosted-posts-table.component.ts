@@ -1,9 +1,10 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { ButtonModule } from 'primeng/button';
 import { ImageModule } from 'primeng/image';
+import { Router } from '@angular/router';
 
 export interface BoostedPost {
   id: string;
@@ -45,6 +46,8 @@ export interface BoostedPost {
   templateUrl: './boosted-posts-table.component.html',
 })
 export class BoostedPostsTableComponent {
+  private router = inject(Router);
+
   @Input() boostedPosts: BoostedPost[] = [];
   @Input() showUserColumn: boolean = true;
   @Input() showLocationColumn: boolean = true;
@@ -52,7 +55,7 @@ export class BoostedPostsTableComponent {
   @Input() rowsPerPage: number = 10;
   @Input() loading: boolean = false;
   @Input() showRefreshButton: boolean = true;
-  
+
   @Output() postClick = new EventEmitter<BoostedPost>();
   @Output() userClick = new EventEmitter<string>();
   @Output() refreshClick = new EventEmitter<void>();
@@ -63,7 +66,7 @@ export class BoostedPostsTableComponent {
 
   onUserClick(userId: string, event: Event): void {
     event.stopPropagation();
-    this.userClick.emit(userId);
+    this.router.navigate(['/dashboard/users', userId, 'boost']);
   }
 
   onRefreshClick(): void {
@@ -88,7 +91,7 @@ export class BoostedPostsTableComponent {
   formatPrice(amount: number): string {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'USD'
+      currency: 'USD',
     }).format(amount);
   }
 
@@ -99,7 +102,7 @@ export class BoostedPostsTableComponent {
       month: 'short',
       day: 'numeric',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     });
   }
 
@@ -160,7 +163,7 @@ export class BoostedPostsTableComponent {
     const expires = new Date(expiresAt);
     const diffTime = expires.getTime() - now.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
+
     if (diffDays <= 0) {
       return 'Expired';
     } else if (diffDays === 1) {

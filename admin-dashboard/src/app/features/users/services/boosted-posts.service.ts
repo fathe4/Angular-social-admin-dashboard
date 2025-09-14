@@ -73,10 +73,11 @@ export interface BoostedPostsFilters {
   offset?: number;
   sortBy?: string;
   sortOrder?: string;
+  search?: string;
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class BoostedPostsService {
   private readonly http = inject(HttpClient);
@@ -98,15 +99,18 @@ export class BoostedPostsService {
     console.log('Fetching boosted posts with filters:', filters);
     console.log('API URL:', `${this.apiUrl}/posts/boosts`);
 
-    return this.http.get<BoostedPostResponse>(`${this.apiUrl}/posts/boosts`, { 
-      params: httpParams 
+    return this.http.get<BoostedPostResponse>(`${this.apiUrl}/posts/boosts`, {
+      params: httpParams,
     });
   }
 
   /**
    * Get boosted posts for a specific user
    */
-  getUserBoostedPosts(userId: string, filters: BoostedPostsFilters = {}): Observable<BoostedPostResponse> {
+  getUserBoostedPosts(
+    userId: string,
+    filters: BoostedPostsFilters = {}
+  ): Observable<BoostedPostResponse> {
     let httpParams = new HttpParams();
 
     // Add filters to query parameters
@@ -116,8 +120,9 @@ export class BoostedPostsService {
       }
     });
 
-    return this.http.get<BoostedPostResponse>(`${this.apiUrl}/posts/boosts/my`, { 
-      params: httpParams 
+    return this.http.get<BoostedPostResponse>(`${this.apiUrl}/posts/boosts/my`, {
+      params: httpParams,
     });
   }
 }
+

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
@@ -7,7 +7,10 @@ import { FormsModule } from '@angular/forms';
 import { DatePicker } from 'primeng/datepicker';
 import { Select } from 'primeng/select';
 import { MessageService } from 'primeng/api';
-import { BoostedPostsTableComponent, BoostedPost } from '../../../../shared/components/boosted-posts-table/boosted-posts-table.component';
+import {
+  BoostedPostsTableComponent,
+  BoostedPost,
+} from '../../../../shared/components/boosted-posts-table/boosted-posts-table.component';
 import { BoostedPostsService, BoostedPostsFilters } from '../../services/boosted-posts.service';
 
 @Component({
@@ -21,34 +24,39 @@ import { BoostedPostsService, BoostedPostsFilters } from '../../services/boosted
     FormsModule,
     DatePicker,
     Select,
-    BoostedPostsTableComponent
+    BoostedPostsTableComponent,
   ],
   providers: [MessageService],
   templateUrl: './boosted-posts-page.component.html',
+  // No changeDetection needed - signals handle this automatically!
 })
 export class BoostedPostsPageComponent implements OnInit {
-  boostedPosts: BoostedPost[] = [];
-  filteredBoostedPosts: BoostedPost[] = [];
-  loading: boolean = false;
-  totalCount: number = 0;
-  
-  // Filter properties
-  searchTerm: string = '';
-  statusFilter: any = undefined;
-  locationFilter: any = undefined;
-  priceRangeFilter: any = undefined;
-  startDate: Date | undefined;
-  endDate: Date | undefined;
+  // Inject services using inject() function
+  private boostedPostsService = inject(BoostedPostsService);
+  private messageService = inject(MessageService);
 
-  // Filter options
+  // Convert all properties to signals
+  boostedPosts = signal<BoostedPost[]>([]);
+  loading = signal<boolean>(false);
+  totalCount = signal<number>(0);
+
+  // Filter properties as signals
+  searchTerm = signal<string>('');
+  statusFilter = signal<any>(undefined);
+  locationFilter = signal<any>(undefined);
+  priceRangeFilter = signal<any>(undefined);
+  startDate = signal<Date | undefined>(undefined);
+  endDate = signal<Date | undefined>(undefined);
+
+  // Filter options (static data - no need for signals)
   statusOptions = [
     { name: 'All Status', code: '' },
     { name: 'Active', code: 'active' },
     { name: 'Pending', code: 'pending' },
     { name: 'Expired', code: 'expired' },
-    { name: 'Inactive', code: 'inactive' }
+    { name: 'Inactive', code: 'inactive' },
   ];
-  
+
   locationOptions = [
     { name: 'All Locations', code: '' },
     { name: 'New York', code: 'New York' },
@@ -60,7 +68,7 @@ export class BoostedPostsPageComponent implements OnInit {
     { name: 'San Antonio', code: 'San Antonio' },
     { name: 'San Diego', code: 'San Diego' },
     { name: 'Dallas', code: 'Dallas' },
-    { name: 'San Jose', code: 'San Jose' }
+    { name: 'San Jose', code: 'San Jose' },
   ];
 
   priceRangeOptions = [
@@ -69,143 +77,143 @@ export class BoostedPostsPageComponent implements OnInit {
     { name: '$10 - $50', code: '10-50' },
     { name: '$50 - $100', code: '50-100' },
     { name: '$100 - $200', code: '100-200' },
-    { name: 'Over $200', code: 'over-200' }
+    { name: 'Over $200', code: 'over-200' },
   ];
 
-  constructor(
-    private boostedPostsService: BoostedPostsService,
-    private messageService: MessageService
-  ) {}
+  // Computed properties (automatically update when dependencies change)
+  displayText = computed(
+    () => `Showing ${this.boostedPosts().length} of ${this.totalCount()} boosted posts`
+  );
 
   ngOnInit() {
     this.loadBoostedPosts();
   }
 
   private loadBoostedPosts(): void {
-    this.loading = true;
-    
+    console.log('Starting to load boosted posts, setting loading to true');
+    this.loading.set(true);
+
     const filters: BoostedPostsFilters = {
       includePostDetails: true,
       includeUserDetails: true,
       limit: 100,
       offset: 0,
       sortBy: 'created_at',
-      sortOrder: 'desc'
+      sortOrder: 'desc',
+      // Server-side filters - use signal values
+      status: this.statusFilter()?.code || undefined,
+      city: this.locationFilter()?.code || undefined,
+      minAmount: this.getMinAmount(),
+      maxAmount: this.getMaxAmount(),
+      createdAfter: this.startDate()?.toISOString() || undefined,
+      createdBefore: this.endDate()?.toISOString() || undefined,
+      // Search functionality
+      search: this.searchTerm() || undefined,
     };
 
     this.boostedPostsService.getBoostedPosts(filters).subscribe({
       next: (response) => {
-        this.boostedPosts = response.data.boostedPosts;
-        this.totalCount = response.data.totalCount;
-        this.filteredBoostedPosts = [...this.boostedPosts];
-        this.loading = false;
-        console.log('Loaded boosted posts:', this.boostedPosts);
+        console.log('Received response, setting loading to false');
+        this.boostedPosts.set(response.data.boostedPosts);
+        this.totalCount.set(response.data.totalCount);
+        this.loading.set(false);
+        console.log('Loaded boosted posts:', this.boostedPosts());
+        console.log('Loading state after success:', this.loading());
+
+        // ✅ NO MANUAL CHANGE DETECTION NEEDED!
+        // Signals automatically trigger change detection
       },
       error: (error) => {
         console.error('Error loading boosted posts:', error);
+        console.log('Error occurred, setting loading to false');
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: 'Failed to load boosted posts. Please try again.'
+          detail: 'Failed to load boosted posts. Please try again.',
         });
-        this.loading = false;
-      }
+        this.loading.set(false);
+        console.log('Loading state after error:', this.loading());
+
+        // ✅ NO MANUAL CHANGE DETECTION NEEDED!
+      },
     });
   }
 
   applyFilters(): void {
-    this.filteredBoostedPosts = this.boostedPosts.filter(post => {
-      // Search term filter
-      const matchesSearch = !this.searchTerm || 
-        post.post_id.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-        post.posts?.content?.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-        post.users?.username?.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-        post.users?.first_name?.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-        post.users?.last_name?.toLowerCase().includes(this.searchTerm.toLowerCase());
-
-      // Status filter
-      const matchesStatus = !this.statusFilter || !this.statusFilter.code || 
-        post.status.toLowerCase() === this.statusFilter.code;
-
-      // Location filter
-      const location = this.getLocationString(post);
-      const matchesLocation = !this.locationFilter || !this.locationFilter.code || 
-        location.toLowerCase().includes(this.locationFilter.code.toLowerCase());
-
-      // Price range filter
-      let matchesPriceRange = true;
-      if (this.priceRangeFilter && this.priceRangeFilter.code) {
-        const amount = post.amount;
-        switch (this.priceRangeFilter.code) {
-          case 'under-10':
-            matchesPriceRange = amount < 10;
-            break;
-          case '10-50':
-            matchesPriceRange = amount >= 10 && amount <= 50;
-            break;
-          case '50-100':
-            matchesPriceRange = amount > 50 && amount <= 100;
-            break;
-          case '100-200':
-            matchesPriceRange = amount > 100 && amount <= 200;
-            break;
-          case 'over-200':
-            matchesPriceRange = amount > 200;
-            break;
-        }
-      }
-
-      // Date range filter
-      let matchesDateRange = true;
-      if (this.startDate || this.endDate) {
-        const postDate = new Date(post.created_at || '');
-        
-        if (this.startDate && this.endDate) {
-          matchesDateRange = postDate >= this.startDate && postDate <= this.endDate;
-        } else if (this.startDate) {
-          matchesDateRange = postDate >= this.startDate;
-        } else if (this.endDate) {
-          matchesDateRange = postDate <= this.endDate;
-        }
-      }
-
-      return matchesSearch && matchesStatus && matchesLocation && matchesPriceRange && matchesDateRange;
-    });
+    console.log('Applying filters, current loading state:', this.loading());
+    this.loadBoostedPosts();
+    // ✅ NO MANUAL CHANGE DETECTION NEEDED!
   }
 
-  private getLocationString(post: BoostedPost): string {
-    if (post.city && post.country) {
-      return `${post.city}, ${post.country}`;
-    } else if (post.city) {
-      return post.city;
-    } else if (post.country) {
-      return post.country;
+  private getMinAmount(): number | undefined {
+    const priceFilter = this.priceRangeFilter();
+    if (!priceFilter?.code) return undefined;
+
+    switch (priceFilter.code) {
+      case 'under-10':
+        return 0;
+      case '10-50':
+        return 10;
+      case '50-100':
+        return 50;
+      case '100-200':
+        return 100;
+      case 'over-200':
+        return 200;
+      default:
+        return undefined;
     }
-    return '';
+  }
+
+  private getMaxAmount(): number | undefined {
+    const priceFilter = this.priceRangeFilter();
+    if (!priceFilter?.code) return undefined;
+
+    switch (priceFilter.code) {
+      case 'under-10':
+        return 10;
+      case '10-50':
+        return 50;
+      case '50-100':
+        return 100;
+      case '100-200':
+        return 200;
+      case 'over-200':
+        return undefined; // No upper limit
+      default:
+        return undefined;
+    }
   }
 
   clearFilters(): void {
-    this.searchTerm = '';
-    this.statusFilter = undefined;
-    this.locationFilter = undefined;
-    this.priceRangeFilter = undefined;
-    this.startDate = undefined;
-    this.endDate = undefined;
+    this.searchTerm.set('');
+    this.statusFilter.set(undefined);
+    this.locationFilter.set(undefined);
+    this.priceRangeFilter.set(undefined);
+    this.startDate.set(undefined);
+    this.endDate.set(undefined);
     this.applyFilters();
   }
 
   onPostClick(post: BoostedPost): void {
     console.log('Post clicked:', post);
-    // TODO: Navigate to post details or show modal
   }
 
   onUserClick(userId: string): void {
     console.log('User clicked:', userId);
-    // TODO: Navigate to user details
   }
 
   onRefreshClick(): void {
     console.log('Refresh clicked');
     this.loadBoostedPosts();
+    // ✅ NO MANUAL CHANGE DETECTION NEEDED!
+  }
+
+  // Debug method to test loading state
+  testLoadingState(): void {
+    console.log('Current loading state:', this.loading());
+    this.loading.set(!this.loading());
+    console.log('Toggled loading state to:', this.loading());
+    // ✅ NO MANUAL CHANGE DETECTION NEEDED!
   }
 }
