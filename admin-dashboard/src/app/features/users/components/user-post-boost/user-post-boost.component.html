@@ -1,10 +1,26 @@
-<app-boosted-posts-table
-  [boostedPosts]="postBoost"
-  [showUserColumn]="false"
-  [showLocationColumn]="true"
-  [showPaginator]="false"
-  [showRefreshButton]="true"
-  (postClick)="onPostClick($event)"
-  (userClick)="onUserClick($event)"
-  (refreshClick)="onRefreshClick()"
-></app-boosted-posts-table>
+<div class="w-full">
+  <!-- Page Header -->
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-gray-900 mb-2">User Boosted Posts</h1>
+  </div>
+
+  <!-- Results Summary -->
+  <div class="mb-4">
+    <p class="text-sm text-gray-600">
+      {{ displayText() }}
+    </p>
+  </div>
+
+  <!-- Boosted Posts Table -->
+  <app-boosted-posts-table
+    [boostedPosts]="postBoost()"
+    [loading]="loading()"
+    [showUserColumn]="false"
+    [showLocationColumn]="true"
+    [showPaginator]="false"
+    [showRefreshButton]="true"
+    (postClick)="onPostClick($event)"
+    (userClick)="onUserClick($event)"
+    (refreshClick)="onRefreshClick()"
+  ></app-boosted-posts-table>
+</div>

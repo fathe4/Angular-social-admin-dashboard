@@ -87,7 +87,15 @@ export interface UserLocation extends BaseModel {
   altitude?: number | null;
   heading?: number | null;
   speed?: number | null;
+  city?: string | null;
+  country?: string | null;
+  ip_address?: string | null;
+  location_source?: string | null;
+  additional_metadata?: Record<string, any> | null;
   timestamp: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
 }
 
 // File upload result interface (from storage service)
@@ -277,4 +285,116 @@ export interface UserListResponse {
   page: number;
   totalPages: number;
   limit: number;
+}
+
+// User Details Endpoint Types
+
+// User Profile Details (from userService.ts)
+export interface UserProfileDetails {
+  location: string | null;
+  coordinates: [number, number] | null;
+  interests: string[];
+  birth_date: string | null;
+  occupation: string | null;
+  education: string | null;
+  relationship_status: string | null;
+}
+
+// Marketplace Statistics
+export interface MarketplaceStats {
+  isActive: boolean;
+  activeListingsCount: number;
+  totalListingsCount: number;
+  averageRating: number | null;
+  totalRatings: number;
+  recentListings: MarketplaceListing[];
+}
+
+// Marketplace Listing (simplified)
+export interface MarketplaceListing {
+  id: string;
+  title: string;
+  status: string;
+  approval_status: string;
+  created_at: string;
+  subscription_tier_id?: string;
+}
+
+// Subscription Details
+export interface SubscriptionDetails {
+  tier: SubscriptionTier | null;
+  status: 'active' | 'inactive' | 'expired' | 'none';
+  startedAt: string | null;
+  expiresAt: string | null;
+  isActive: boolean;
+}
+
+// Subscription Tier
+export interface SubscriptionTier {
+  name: string;
+  description: string;
+  price: number;
+  duration_days: number;
+  featured_listings: number;
+  listing_limit: number;
+  priority_search: boolean;
+}
+
+// User Location Details
+export interface UserLocationDetails {
+  current: UserLocation | null;
+  profile: string | null;
+}
+
+// User Statistics
+export interface UserStats {
+  totalListings: number;
+  activeListings: number;
+  totalRatings: number;
+  averageRating: number | null;
+}
+
+// Complete User Details (without password)
+export interface UserDetailsResponse {
+  // Basic User Info (from User model, excluding password_hash)
+  id: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  username: string;
+  profile_picture?: string;
+  cover_picture?: string;
+  bio?: string;
+  contact_info?: Record<string, any>;
+  role: UserRole;
+  is_verified: boolean;
+  is_active: boolean;
+  settings?: Record<string, any>;
+  created_at: string;
+  updated_at: string;
+
+  // Additional Details
+  profile: UserProfileDetails | null;
+  location: UserLocationDetails;
+  marketplace: MarketplaceStats;
+  subscription: SubscriptionDetails;
+  stats: UserStats;
+}
+
+// Query Parameters for getUserDetails endpoint
+export interface GetUserDetailsQuery {
+  includeProfile?: 'true' | 'false';
+  includeLocation?: 'true' | 'false';
+  includeMarketplace?: 'true' | 'false';
+  includeSubscription?: 'true' | 'false';
+  marketplaceLimit?: string;
+}
+
+// Backend Response for getUserDetails endpoint
+export interface BackendUserDetailsResponse {
+  status: 'success' | 'error';
+  message?: string;
+  data: {
+    user: UserDetailsResponse;
+  };
 }

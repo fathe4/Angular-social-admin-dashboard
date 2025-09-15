@@ -1,180 +1,98 @@
-import { Component, OnInit } from '@angular/core';
+// admin-dashboard/src/app/features/users/components/user-post-boost/user-post-boost.component.ts
+import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { BoostedPostsTableComponent, BoostedPost } from '../../../../shared/components/boosted-posts-table/boosted-posts-table.component';
+import { ActivatedRoute, Router } from '@angular/router';
+import { MessageService } from 'primeng/api';
+import {
+  BoostedPostsTableComponent,
+  BoostedPost,
+} from '../../../../shared/components/boosted-posts-table/boosted-posts-table.component';
+import {
+  BoostedPostsService,
+  BoostedPostsFilters,
+  BoostedPostResponse,
+} from '../../services/boosted-posts.service';
 
 @Component({
   selector: 'post-boost-list',
   templateUrl: 'user-post-boost.component.html',
   standalone: true,
   imports: [CommonModule, BoostedPostsTableComponent],
-  providers: [],
+  providers: [MessageService],
 })
 export class PostBoostList implements OnInit {
-  postBoost: BoostedPost[] = [];
+  // Inject services
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private boostedPostsService = inject(BoostedPostsService);
+  private messageService = inject(MessageService);
+
+  // Convert properties to signals
+  postBoost = signal<BoostedPost[]>([]);
+  loading = signal<boolean>(false);
+  totalCount = signal<number>(0);
+  userId = signal<string>('');
+
+  // Computed properties
+  displayText = computed(
+    () =>
+      `Showing ${
+        this.postBoost().length
+      } of ${this.totalCount()} boosted posts for user ${this.userId()}`
+  );
 
   ngOnInit() {
-    this.postBoost = [
-      {
-        id: 'boost-001',
-        post_id: 'P-1001',
-        user_id: 'user-001',
-        amount: 49.99,
-        days: 30,
-        status: 'active',
-        city: 'New York',
-        country: 'USA',
-        estimated_reach: 1000,
-        created_at: '2025-01-15T10:30:00Z',
-        expires_at: '2025-02-14T10:30:00Z',
-        coordinates: null,
-        posts: {
-          id: 'P-1001',
-          content: 'Amazing Sunset Photography - Beautiful sunset captured during my recent trip',
-          media: [{ url: 'https://picsum.photos/100?random=1' }],
-          visibility: 'public',
-          view_count: 150,
-          created_at: '2025-01-15T10:30:00Z',
-          user_id: 'user-001',
-          is_boosted: true
-        },
-        users: {
-          id: 'user-001',
-          username: 'photographer_john',
-          first_name: 'John',
-          last_name: 'Doe',
-          profile_picture: 'https://picsum.photos/40?random=user1',
-          is_verified: true
-        }
-      },
-      {
-        id: 'boost-002',
-        post_id: 'P-1002',
-        user_id: 'user-002',
-        amount: 19.99,
-        days: 15,
-        status: 'pending',
-        city: 'Los Angeles',
-        country: 'USA',
-        estimated_reach: 500,
-        created_at: '2025-01-20T14:15:00Z',
-        expires_at: '2025-02-04T14:15:00Z',
-        coordinates: null,
-        posts: {
-          id: 'P-1002',
-          content: 'Tech Innovation Showcase - Latest technology trends and innovations',
-          media: [{ url: 'https://picsum.photos/100?random=2' }],
-          visibility: 'public',
-          view_count: 75,
-          created_at: '2025-01-20T14:15:00Z',
-          user_id: 'user-002',
-          is_boosted: true
-        },
-        users: {
-          id: 'user-002',
-          username: 'tech_guru',
-          first_name: 'Jane',
-          last_name: 'Smith',
-          profile_picture: 'https://picsum.photos/40?random=user1',
-          is_verified: false
-        }
-      },
-      {
-        id: 'boost-003',
-        post_id: 'P-1003',
-        user_id: 'user-003',
-        amount: 9.99,
-        days: 7,
-        status: 'expired',
-        city: 'Chicago',
-        country: 'USA',
-        estimated_reach: 200,
-        created_at: '2025-01-10T09:45:00Z',
-        expires_at: '2025-01-17T09:45:00Z',
-        coordinates: null,
-        posts: {
-          id: 'P-1003',
-          content: 'Food Recipe Collection - Delicious recipes from around the world',
-          media: [{ url: 'https://picsum.photos/100?random=3' }],
-          visibility: 'public',
-          view_count: 300,
-          created_at: '2025-01-10T09:45:00Z',
-          user_id: 'user-003',
-          is_boosted: true
-        },
-        users: {
-          id: 'user-003',
-          username: 'chef_mike',
-          first_name: 'Mike',
-          last_name: 'Johnson',
-          profile_picture: 'https://picsum.photos/40?random=user1',
-          is_verified: true
-        }
-      },
-      {
-        id: 'boost-004',
-        post_id: 'P-1004',
-        user_id: 'user-004',
-        amount: 99.99,
-        days: 60,
-        status: 'active',
-        city: 'Houston',
-        country: 'USA',
-        estimated_reach: 2000,
-        created_at: '2025-01-05T16:20:00Z',
-        expires_at: '2025-03-06T16:20:00Z',
-        coordinates: null,
-        posts: {
-          id: 'P-1004',
-          content: 'Fitness Journey Progress - My transformation journey and fitness tips',
-          media: [{ url: 'https://picsum.photos/100?random=4' }],
-          visibility: 'public',
-          view_count: 500,
-          created_at: '2025-01-05T16:20:00Z',
-          user_id: 'user-004',
-          is_boosted: true
-        },
-        users: {
-          id: 'user-004',
-          username: 'fitness_sarah',
-          first_name: 'Sarah',
-          last_name: 'Wilson',
-          profile_picture: 'https://picsum.photos/40?random=user1',
-          is_verified: true
-        }
-      },
-      {
-        id: 'boost-005',
-        post_id: 'P-1005',
-        user_id: 'user-005',
-        amount: 149.99,
-        days: 90,
-        status: 'inactive',
-        city: 'Phoenix',
-        country: 'USA',
-        estimated_reach: 3000,
-        created_at: '2025-01-01T12:00:00Z',
-        expires_at: '2025-04-01T12:00:00Z',
-        coordinates: null,
-        posts: {
-          id: 'P-1005',
-          content: 'Travel Adventure Blog - Exploring hidden gems around the world',
-          media: [{ url: 'https://picsum.photos/100?random=5' }],
-          visibility: 'public',
-          view_count: 800,
-          created_at: '2025-01-01T12:00:00Z',
-          user_id: 'user-005',
-          is_boosted: true
-        },
-        users: {
-          id: 'user-005',
-          username: 'traveler_alex',
-          first_name: 'Alex',
-          last_name: 'Brown',
-          profile_picture: 'https://picsum.photos/40?random=user1',
-          is_verified: true
-        }
+    // Get userId from route parameters
+    this.route.parent?.params.subscribe((params) => {
+      const userId = params['id'];
+      if (userId) {
+        this.userId.set(userId);
+        this.loadUserBoostedPosts(userId);
+      } else {
+        console.error('No user ID found in route parameters');
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'No user ID provided in the route.',
+        });
       }
-    ];
+    });
+  }
+
+  private loadUserBoostedPosts(userId: string): void {
+    console.log('Loading boosted posts for user:', userId);
+    this.loading.set(true);
+
+    const filters: BoostedPostsFilters = {
+      userId: userId,
+      includePostDetails: true,
+      includeUserDetails: true,
+      limit: 100,
+      offset: 0,
+      sortBy: 'created_at',
+      sortOrder: 'desc',
+    };
+
+    this.boostedPostsService.getBoostedPosts(filters).subscribe({
+      next: (response: BoostedPostResponse) => {
+        console.log('Received user boosted posts response:', response);
+        this.postBoost.set(response.data?.boostedPosts || []);
+        this.totalCount.set(response.data?.totalCount || 0);
+        this.loading.set(false);
+        console.log('Loaded user boosted posts:', this.postBoost());
+      },
+      error: (error: any) => {
+        console.error('Error loading user boosted posts:', error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to load user boosted posts. Please try again.',
+        });
+        this.postBoost.set([]);
+        this.totalCount.set(0);
+        this.loading.set(false);
+      },
+    });
   }
 
   onPostClick(post: BoostedPost): void {
@@ -184,11 +102,15 @@ export class PostBoostList implements OnInit {
 
   onUserClick(userId: string): void {
     console.log('User clicked:', userId);
-    // TODO: Navigate to user details
+    // Navigate to user details
+    this.router.navigate(['/dashboard/users', userId]);
   }
 
   onRefreshClick(): void {
     console.log('Refresh clicked');
-    // TODO: Reload data from API
+    const currentUserId = this.userId();
+    if (currentUserId) {
+      this.loadUserBoostedPosts(currentUserId);
+    }
   }
 }

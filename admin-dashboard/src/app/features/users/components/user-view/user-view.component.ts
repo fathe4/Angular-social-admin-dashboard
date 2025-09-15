@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { CardModule } from 'primeng/card';
@@ -6,11 +6,23 @@ import { AvatarModule } from 'primeng/avatar';
 import { ButtonModule } from 'primeng/button';
 import { DividerModule } from 'primeng/divider';
 import { BadgeModule } from 'primeng/badge';
-import { User, UserRole } from '../../models/user.model';
 import { TabsModule } from 'primeng/tabs';
 import { TagModule } from 'primeng/tag';
 import { ChipModule } from 'primeng/chip';
 import { ImageModule } from 'primeng/image';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { MessageModule } from 'primeng/message';
+import { UserService } from '../../services/user.service';
+import {
+  UserDetailsResponse,
+  UserRole,
+  MarketplaceStats,
+  SubscriptionDetails,
+  UserProfileDetails,
+  UserLocationDetails,
+  UserStats,
+} from '../../models/user.model';
+import { catchError, of, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-user-view',
@@ -27,60 +39,106 @@ import { ImageModule } from 'primeng/image';
     TagModule,
     ImageModule,
     ChipModule,
+    ProgressSpinnerModule,
+    MessageModule,
   ],
   templateUrl: './user-view.component.html',
 })
 export class UserViewComponent implements OnInit {
-  user: any = {};
-  userId: string | null = null;
-  activeTab: string = 'dashboard';
-  currentUrl: string = '';
-  tabs: any[] = []; // Initialize as empty array
+  // Signals for reactive state management
+  private userService = inject(UserService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
 
-  constructor(private route: ActivatedRoute, private router: Router) {}
+  // State signals
+  userId = signal<string | null>(null);
+  userDetails = signal<UserDetailsResponse | null>(null);
+  loading = signal<boolean>(true);
+  error = signal<string | null>(null);
+  activeTab = signal<string>('dashboard');
+  currentUrl = signal<string>('');
 
-  ngOnInit(): void {
-    this.router.events.subscribe(() => {
-      this.currentUrl = this.router.url;
-    });
+  // Computed signals for derived state
+  user = computed(() =>
+    this.userDetails()?.id
+      ? {
+          ...this.userDetails()!,
+          // Add any additional computed properties here
+        }
+      : null
+  );
 
-    this.route.params.subscribe((params) => {
-      this.userId = params['id'];
-      this.loadUser();
-      this.setupTabs();
-    });
-  }
+  tabs = computed(() => {
+    const id = this.userId();
+    if (!id) return [];
 
-  private setupTabs(): void {
-    if (!this.userId) return;
-
-    this.tabs = [
+    return [
       {
         id: 0,
-        // ✅ Fixed: Correct absolute path for nested child routes
-        route: `/dashboard/users/${this.userId}/subscriptions`,
+        route: `/dashboard/users/${id}/subscriptions`,
         label: 'Subscriptions',
         icon: 'pi pi-home',
       },
       {
         id: 1,
-        // ✅ Fixed: Correct absolute path for nested child routes
-        route: `/dashboard/users/${this.userId}/transactions`,
+        route: `/dashboard/users/${id}/transactions`,
         label: 'Transactions',
         icon: 'pi pi-chart-line',
       },
       {
         id: 2,
-        // ✅ Fixed: These should also be nested under the current user if you want them as tabs
-        // Or change them to absolute paths if they're separate sections
-        route: `/dashboard/users/${this.userId}/boost`,
+        route: `/dashboard/users/${id}/boost`,
         label: 'Posts Boost',
         icon: 'pi pi-list',
       },
     ];
+  });
 
+  // Computed signals for user data sections
+  profileData = computed(() => this.userDetails()?.profile);
+  locationData = computed(() => this.userDetails()?.location);
+  marketplaceData = computed(() => this.userDetails()?.marketplace);
+  subscriptionData = computed(() => this.userDetails()?.subscription);
+  statsData = computed(() => this.userDetails()?.stats);
+
+  ngOnInit(): void {
+    // Track router events
+    this.router.events.subscribe(() => {
+      this.currentUrl.set(this.router.url);
+    });
+
+    // Subscribe to route params and load user details
+    this.route.params
+      .pipe(
+        switchMap((params) => {
+          const userId = params['id'];
+          this.userId.set(userId);
+          this.loading.set(true);
+          this.error.set(null);
+
+          return this.userService.getUserDetails(userId, {
+            includeProfile: true,
+            includeLocation: true,
+            includeMarketplace: true,
+            includeSubscription: true,
+            marketplaceLimit: 10,
+          });
+        }),
+        catchError((err) => {
+          this.error.set(err.message || 'Failed to load user details');
+          this.loading.set(false);
+          return of(null);
+        })
+      )
+      .subscribe((userDetails) => {
+        if (userDetails) {
+          this.userDetails.set(userDetails);
+        }
+        this.loading.set(false);
+      });
   }
 
+  // Utility methods
   getRoleClasses(role: string): string {
     const roleClasses: { [key: string]: string } = {
       ADMIN: 'bg-red-100 text-red-800',
@@ -92,9 +150,10 @@ export class UserViewComponent implements OnInit {
   }
 
   getJoinDuration(): string {
-    if (!this.user?.join_date) return '0d';
+    const user = this.userDetails();
+    if (!user?.created_at) return '0d';
 
-    const joinDate = new Date(this.user.join_date);
+    const joinDate = new Date(user.created_at);
     const now = new Date();
     const diffTime = Math.abs(now.getTime() - joinDate.getTime());
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -116,14 +175,6 @@ export class UserViewComponent implements OnInit {
     });
   }
 
-  formatJoinDate(dateString: string): string {
-    if (!dateString) return '';
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-    });
-  }
-
   getWebsiteDomain(url: string): string {
     try {
       return new URL(url).hostname.replace('www.', '');
@@ -132,57 +183,27 @@ export class UserViewComponent implements OnInit {
     }
   }
 
-  private loadUser(): void {
-    // Static user data for demonstration
-    this.user = {
-      id: this.userId || '1',
-      email: 'john.doe@example.com',
-      first_name: 'John',
-      last_name: 'Doe',
-      username: 'john_doe',
-      profile_picture: 'https://randomuser.me/api/portraits/men/1.jpg',
-      cover_picture: 'https://picsum.photos/seed/john/800/200',
-      bio: 'Tech enthusiast, coffee lover, and weekend traveler. Passionate about creating innovative solutions and exploring new technologies.',
-      location: 'New York, USA',
-      contact_info: {
-        phone: '+1-555-0123',
-        website: 'https://johndoe.dev',
-        linkedin: 'https://linkedin.com/in/johndoe',
-        twitter: '@johndoe',
-      },
-      role: UserRole.ADMIN,
-      is_verified: true,
-      is_active: true,
-      settings: {
-        notifications: true,
-        privacy: 'public',
-        theme: 'light',
-      },
-      created_at: '2023-01-10T10:00:00Z',
-      updated_at: '2023-06-05T14:30:00Z',
-      phone: '+1-555-0123',
-      projects: 12,
-      join_date: '2023-01-10',
-    };
-  }
-
+  // Action methods
   onEditUser(): void {
-    console.log('Edit user:', this.user?.id);
+    const user = this.userDetails();
+    console.log('Edit user:', user?.id);
     // TODO: Implement edit functionality
   }
 
   onDeleteUser(): void {
-    console.log('Delete user:', this.user?.id);
+    const user = this.userDetails();
+    console.log('Delete user:', user?.id);
     // TODO: Implement delete functionality
   }
 
   onViewProfile(): void {
-    console.log('View profile:', this.user?.id);
+    const user = this.userDetails();
+    console.log('View profile:', user?.id);
     // TODO: Implement view profile functionality
   }
 
   setActiveTab(tab: string): void {
-    this.activeTab = tab;
+    this.activeTab.set(tab);
   }
 
   getRoleBadgeSeverity(role: UserRole): string {
@@ -206,5 +227,36 @@ export class UserViewComponent implements OnInit {
 
   getVerificationBadgeSeverity(isVerified: boolean): string {
     return isVerified ? 'success' : 'warning';
+  }
+
+  // Refresh user data
+  refreshUserDetails(): void {
+    const userId = this.userId();
+    if (!userId) return;
+
+    this.loading.set(true);
+    this.error.set(null);
+
+    this.userService
+      .getUserDetails(userId, {
+        includeProfile: true,
+        includeLocation: true,
+        includeMarketplace: true,
+        includeSubscription: true,
+        marketplaceLimit: 10,
+      })
+      .pipe(
+        catchError((err) => {
+          this.error.set(err.message || 'Failed to refresh user details');
+          this.loading.set(false);
+          return of(null);
+        })
+      )
+      .subscribe((userDetails) => {
+        if (userDetails) {
+          this.userDetails.set(userDetails);
+        }
+        this.loading.set(false);
+      });
   }
 }

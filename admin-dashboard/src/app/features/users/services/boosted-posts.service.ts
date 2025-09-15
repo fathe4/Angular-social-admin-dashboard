@@ -1,3 +1,4 @@
+// admin-dashboard/src/app/features/users/services/boosted-posts.service.ts
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -125,4 +126,3 @@ export class BoostedPostsService {
     });
   }
 }
-
