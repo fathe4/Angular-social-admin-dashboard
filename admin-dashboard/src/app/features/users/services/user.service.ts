@@ -10,6 +10,8 @@ import {
   UpdateUserRequest,
   UserRole,
   UsersListResponse,
+  UserDetailsResponse,
+  BackendUserDetailsResponse,
 } from '../models/user.model';
 import { environment } from '../../../../environments/environment';
 
@@ -119,6 +121,49 @@ export class UserService {
       .post<BackendSingleUserResponse>(
         `${this.apiUrl}${environment.endpoints.users.create}`,
         userData
+      )
+      .pipe(
+        map((response) => response.data.user),
+        catchError(this.handleError)
+      );
+  }
+  /**
+   * Get user details with comprehensive information (profile, location, marketplace, subscription)
+   */
+  getUserDetails(
+    id: string,
+    options: {
+      includeProfile?: boolean;
+      includeLocation?: boolean;
+      includeMarketplace?: boolean;
+      includeSubscription?: boolean;
+      marketplaceLimit?: number;
+    }
+  ): Observable<UserDetailsResponse> {
+    let params = new HttpParams();
+
+    if (options.includeProfile !== undefined) {
+      params = params.set('includeProfile', options.includeProfile.toString());
+    }
+    if (options.includeLocation !== undefined) {
+      params = params.set('includeLocation', options.includeLocation.toString());
+    }
+    if (options.includeMarketplace !== undefined) {
+      params = params.set('includeMarketplace', options.includeMarketplace.toString());
+    }
+    if (options.includeSubscription !== undefined) {
+      params = params.set('includeSubscription', options.includeSubscription.toString());
+    }
+    if (options.marketplaceLimit !== undefined) {
+      params = params.set('marketplaceLimit', options.marketplaceLimit.toString());
+    }
+
+    return this.http
+      .get<BackendUserDetailsResponse>(
+        `${this.apiUrl}${environment.endpoints.users.detail}/${id}/details`,
+        {
+          params,
+        }
       )
       .pipe(
         map((response) => response.data.user),
