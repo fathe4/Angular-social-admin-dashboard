@@ -1,0 +1,15 @@
+// Custom styles for PrimeNG tabs
+:host ::ng-deep {
+  .p-tablist {
+    .p-tab {
+      &.p-tab-active {
+        color: #4f46e5 !important; // indigo-600
+        border-bottom-color: #4f46e5 !important; // indigo-600
+      }
+      
+      &:hover {
+        color: #4f46e5 !important; // indigo-600
+      }
+    }
+  }
+}

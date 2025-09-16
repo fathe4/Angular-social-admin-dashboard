@@ -58,9 +58,15 @@
   .main-content {
     @apply flex-1 bg-gray-50 overflow-hidden;
     
-    /* Ensure main content takes full width on mobile */
+    /* Desktop: Add left margin to account for fixed sidebar */
+    @media (min-width: 768px) {
+      margin-left: 288px; // w-72 = 288px
+    }
+    
+    /* Mobile: Full width when sidebar is hidden */
     @media (max-width: 767px) {
       @apply w-full;
+      margin-left: 0;
     }
     
     .content-wrapper {

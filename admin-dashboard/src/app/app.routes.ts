@@ -68,12 +68,19 @@ export const routes: Routes = [
             (m) => m.UserViewComponent
           ),
         children: [
-          // ADD THIS NEW CHILD ROUTE
-          // {
-          //   path: '', // The empty path matches the parent route, acting as a default child
-          //   redirectTo: 'dashboard',
-          //   pathMatch: 'full',
-          // },
+          {
+            path: '',
+            redirectTo: 'dashboard',
+            pathMatch: 'full',
+          },
+          {
+            path: 'dashboard',
+            loadComponent: () =>
+              import('./features/users/components/user-dashboard/dashboard.component').then(
+                (m) => m.UserDashboardComponent
+              ),
+            data: { breadcrumb: 'Dashboard' },
+          },
           {
             path: 'subscriptions',
             loadComponent: () =>

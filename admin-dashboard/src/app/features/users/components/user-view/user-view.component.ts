@@ -27,6 +27,7 @@ import { catchError, of, switchMap } from 'rxjs';
 @Component({
   selector: 'app-user-view',
   standalone: true,
+  styleUrls: ['./user-view.component.scss'],
   imports: [
     CommonModule,
     CardModule,
@@ -75,8 +76,8 @@ export class UserViewComponent implements OnInit {
     return [
       {
         id: 0,
-        route: `/dashboard/users/${id}/subscriptions`,
-        label: 'Subscriptions',
+        route: `/dashboard/users/${id}/dashboard`,
+        label: 'Dashboard',
         icon: 'pi pi-home',
       },
       {
@@ -211,7 +212,7 @@ export class UserViewComponent implements OnInit {
       case UserRole.SUPER_ADMIN:
         return 'danger';
       case UserRole.ADMIN:
-        return 'warning';
+        return 'warn';
       case UserRole.MODERATOR:
         return 'info';
       case UserRole.USER:
@@ -226,7 +227,7 @@ export class UserViewComponent implements OnInit {
   }
 
   getVerificationBadgeSeverity(isVerified: boolean): string {
-    return isVerified ? 'success' : 'warning';
+    return isVerified ? 'success' : 'warn';
   }
 
   // Refresh user data

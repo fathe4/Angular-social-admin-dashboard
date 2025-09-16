@@ -7,24 +7,30 @@ export const environment = {
   tokenKey: 'admin_auth_token',
   refreshTokenKey: 'admin_refresh_token',
   sessionTimeout: 3600000, // 1 hour in milliseconds
-  
+
   // API endpoints
   endpoints: {
     auth: {
       login: '/auth/login',
       logout: '/auth/logout',
       refresh: '/auth/refresh-token',
-      me: '/auth/me'
+      me: '/auth/me',
     },
     users: {
       list: '/users',
       detail: '/users',
       create: '/users',
       update: '/users',
-      delete: '/users'
+      delete: '/users',
+    },
+    stats: {
+      me: '/stats/me',
+      meQuick: '/stats/me/quick',
+      user: '/stats/user',
+      userQuick: '/stats/user',
     },
     transactions: {
-      user: '/transactions/user'
-    }
-  }
+      user: '/transactions/user',
+    },
+  },
 };

@@ -1,7 +1,7 @@
 <!-- Mobile Backdrop Overlay -->
 <div 
   *ngIf="isOpen()"
-  class="mobile-backdrop"
+  class="fixed inset-0 bg-black/50 z-40 md:hidden"
   (click)="onBackdropClick()"
   role="button"
   aria-label="Close sidebar"
@@ -9,232 +9,65 @@
 
 <!-- Sidebar Container -->
 <aside 
-  class="sidebar"
-  [class.sidebar-open]="isOpen()"
-  (click)="onSidebarClick($event)"
+  class="fixed top-16 left-0 h-[calc(100vh-4rem)] w-72 
+         bg-gradient-to-b from-[#1a1f35] via-[#0f172a] to-[#1f1f1f]
+         text-white shadow-2xl transform transition-transform duration-300 z-50
+         md:translate-x-0"
+  [class.-translate-x-full]="!isOpen()"
   role="navigation" 
   aria-label="Main navigation"
 >
   <!-- Header -->
-  <div class="sidebar-header">
-    <div class="flex items-center gap-3">
-      <!-- Rocket/Spike Icon -->
-      <div class="icon-container" role="img" aria-label="Spike Admin logo">
-        <mat-icon class="header-icon">rocket_launch</mat-icon>
-      </div>
-      <h1 class="header-title">Spike Admin</h1>
+  <div class="flex items-center gap-3 p-6 border-b border-white/10">
+    <div class="flex items-center justify-center w-10 h-10 bg-indigo-600 rounded-lg">
+      <mat-icon class="text-white !text-2xl">rocket_launch</mat-icon>
     </div>
+    <h1 class="text-lg font-bold tracking-tight">Dambala</h1>
   </div>
 
   <!-- Navigation -->
-  <nav class="sidebar-nav" aria-label="Navigation menu">
-    <!-- Main Section (no header) -->
-    <div class="nav-section">
-      <a 
-        [routerLink]="'/dashboard/users'" 
-        routerLinkActive="active"
-        class="nav-item"
-        matTooltip="Manage users and permissions"
-        matTooltipPosition="right"
-        (click)="onNavItemClick()"
-      >
-        <mat-icon class="nav-icon">people</mat-icon>
-        <span class="nav-label">Users</span>
-      </a>
-      
-      <a 
-        [routerLink]="'/dashboard/transactions'" 
-        routerLinkActive="active"
-        class="nav-item"
-        matTooltip="View and manage all transactions"
-        matTooltipPosition="right"
-        (click)="onNavItemClick()"
-      >
-        <mat-icon class="nav-icon">account_balance_wallet</mat-icon>
-        <span class="nav-label">Transactions</span>
-      </a>
-      
-      <a 
-        [routerLink]="'/dashboard/boosted-posts'" 
-        routerLinkActive="active"
-        class="nav-item"
-        matTooltip="View and manage all boosted posts"
-        matTooltipPosition="right"
-        (click)="onNavItemClick()"
-      >
-        <mat-icon class="nav-icon">trending_up</mat-icon>
-        <span class="nav-label">Boosted Posts</span>
-      </a>
-      <a 
-        [routerLink]="'/dashboard/boosted-posts'" 
-        routerLinkActive="active"
-        class="nav-item"
-        matTooltip="View and manage all boosted posts"
-        matTooltipPosition="right"
-        (click)="onNavItemClick()"
-      >
-        <mat-icon class="nav-icon">logout</mat-icon>
-        <span class="nav-label">Logout</span>
-      </a>
-    </div>
+  <nav class="flex-1 p-2 space-y-1 overflow-y-auto">
+    <a 
+      [routerLink]="'/dashboard/users'" 
+      routerLinkActive="active"
+      class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition 
+             text-gray-300 hover:text-white hover:bg-indigo-700/30"
+      (click)="onNavItemClick()"
+    >
+      <mat-icon class="!text-xl">people</mat-icon>
+      <span class="text-sm font-medium">Users</span>
+    </a>
 
-    <!-- Pages Section -->
-    <!-- <div class="nav-section">
-      <h2 class="section-header">PAGES</h2>
-      <a 
-        [routerLink]="'/roll-base-access'" 
-        routerLinkActive="active"
-        class="nav-item"
-        (click)="onNavItemClick()"
-      >
-        <mat-icon class="nav-icon">key</mat-icon>
-        <span class="nav-label">Roll Base Access</span>
-        <span class="pro-badge">PRO</span>
-      </a>
-      
-      <a 
-        [routerLink]="'/treeview'" 
-        routerLinkActive="active"
-        class="nav-item"
-        (click)="onNavItemClick()"
-      >
-        <mat-icon class="nav-icon">account_tree</mat-icon>
-        <span class="nav-label">Treeview</span>
-      </a>
-      
-      <a 
-        [routerLink]="'/pricing'" 
-        routerLinkActive="active"
-        class="nav-item"
-        (click)="onNavItemClick()"
-      >
-        <mat-icon class="nav-icon">attach_money</mat-icon>
-        <span class="nav-label">Pricing</span>
-      </a>
-      
-      <a 
-        [routerLink]="'/account-settings'" 
-        routerLinkActive="active"
-        class="nav-item"
-        (click)="onNavItemClick()"
-      >
-        <mat-icon class="nav-icon">settings</mat-icon>
-        <span class="nav-label">Account Setting</span>
-      </a>
-      
-      <a 
-        [routerLink]="'/faq'" 
-        routerLinkActive="active"
-        class="nav-item"
-        (click)="onNavItemClick()"
-      >
-        <mat-icon class="nav-icon">help_outline</mat-icon>
-        <span class="nav-label">FAQ</span>
-      </a>
-      
-      <a 
-        [routerLink]="'/landing'" 
-        routerLinkActive="active"
-        class="nav-item"
-        (click)="onNavItemClick()"
-      >
-        <mat-icon class="nav-icon">description</mat-icon>
-        <span class="nav-label">Landingpage</span>
-      </a>
-    </div> -->
+    <a 
+      [routerLink]="'/dashboard/transactions'" 
+      routerLinkActive="active"
+      class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition 
+             text-gray-300 hover:text-white hover:bg-indigo-700/30"
+      (click)="onNavItemClick()"
+    >
+      <mat-icon class="!text-xl">account_balance_wallet</mat-icon>
+      <span class="text-sm font-medium">Transactions</span>
+    </a>
 
-    <!-- Widgets Section -->
-    <!-- <div class="nav-section">
-      <button 
-        class="nav-item expandable-item"
-        (click)="toggleWidgets()"
-        [attr.aria-expanded]="isWidgetsExpanded()"
-        aria-controls="widgets-submenu"
-        aria-label="Widgets menu toggle"
-      >
-        <mat-icon class="nav-icon">widgets</mat-icon>
-        <span class="nav-label">Widgets</span>
-        <mat-icon class="expand-icon" [class.expanded]="isWidgetsExpanded()">
-          keyboard_arrow_down
-        </mat-icon>
-      </button>
-      
-      <div 
-        *ngIf="isWidgetsExpanded()" 
-        class="submenu" 
-        id="widgets-submenu" 
-        role="group" 
-        aria-label="Widgets submenu"
-      >
-        <a 
-          [routerLink]="'/widgets/charts'" 
-          routerLinkActive="active"
-          class="nav-item submenu-item"
-          (click)="onNavItemClick()"
-        >
-          <mat-icon class="nav-icon">bar_chart</mat-icon>
-          <span class="nav-label">Charts</span>
-        </a>
-        
-        <a 
-          [routerLink]="'/widgets/tables'" 
-          routerLinkActive="active"
-          class="nav-item submenu-item"
-          (click)="onNavItemClick()"
-        >
-          <mat-icon class="nav-icon">table_view</mat-icon>
-          <span class="nav-label">Tables</span>
-        </a>
-      </div>
-    </div> -->
+    <a 
+      [routerLink]="'/dashboard/boosted-posts'" 
+      routerLinkActive="active"
+      class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition 
+             text-gray-300 hover:text-white hover:bg-indigo-700/30"
+      (click)="onNavItemClick()"
+    >
+      <mat-icon class="!text-xl">trending_up</mat-icon>
+      <span class="text-sm font-medium">Boosted Posts</span>
+    </a>
 
-    <!-- Extra Section -->
-    <!-- <div class="nav-section">
-      <h2 class="section-header">EXTRA</h2>
-      <a 
-        [routerLink]="'/icons'" 
-        routerLinkActive="active"
-        class="nav-item"
-        (click)="onNavItemClick()"
-      >
-        <mat-icon class="nav-icon">category</mat-icon>
-        <span class="nav-label">Icons</span>
-      </a>
-      
-      <a 
-        [routerLink]="'/sample-page'" 
-        routerLinkActive="active"
-        class="nav-item"
-        (click)="onNavItemClick()"
-      >
-        <mat-icon class="nav-icon">article</mat-icon>
-        <span class="nav-label">Sample Page</span>
-      </a>
-    </div> -->
-
-    <!-- Forms Section -->
-    <!-- <div class="nav-section">
-      <h2 class="section-header">FORMS</h2>
-      <a 
-        [routerLink]="'/forms/basic'" 
-        routerLinkActive="active"
-        class="nav-item"
-        (click)="onNavItemClick()"
-      >
-        <mat-icon class="nav-icon">edit_note</mat-icon>
-        <span class="nav-label">Basic Forms</span>
-      </a>
-      
-      <a 
-        [routerLink]="'/forms/advanced'" 
-        routerLinkActive="active"
-        class="nav-item"
-        (click)="onNavItemClick()"
-      >
-        <mat-icon class="nav-icon">dynamic_form</mat-icon>
-        <span class="nav-label">Advanced Forms</span>
-        <span class="pro-badge">PRO</span>
-      </a>
-    </div> -->
+    <a 
+      [routerLink]="'/logout'" 
+      class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition 
+             text-gray-300 hover:text-white hover:bg-red-600/30"
+      (click)="onNavItemClick()"
+    >
+      <mat-icon class="!text-xl">logout</mat-icon>
+      <span class="text-sm font-medium">Logout</span>
+    </a>
   </nav>
 </aside>
