@@ -65,14 +65,6 @@
 
             <div class="flex gap-2">
               <p-button
-                icon="pi pi-refresh"
-                severity="info"
-                size="small"
-                rounded
-                (onClick)="refreshUserDetails()"
-                [loading]="loading()"
-              ></p-button>
-              <p-button
                 icon="pi pi-trash"
                 severity="danger"
                 size="small"
@@ -208,46 +200,58 @@
 
     <!-- Content Section -->
     <div class="w-full md:w-2/3">
-      <!-- Stats Cards -->
-      <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <!-- Marketplace Stats -->
-        @if (marketplaceData()) {
-          <p-card class="text-center">
-            <div class="text-2xl font-bold text-blue-600">{{ marketplaceData()?.activeListingsCount || 0 }}</div>
-            <div class="text-sm text-gray-600">Active Listings</div>
-          </p-card>
-          
-          <p-card class="text-center">
-            <div class="text-2xl font-bold text-green-600">{{ marketplaceData()?.totalListingsCount || 0 }}</div>
-            <div class="text-sm text-gray-600">Total Listings</div>
-          </p-card>
-          
-          <p-card class="text-center">
-            <div class="text-2xl font-bold text-purple-600">{{ marketplaceData()?.averageRating || 0 }}</div>
-            <div class="text-sm text-gray-600">Avg Rating</div>
-          </p-card>
-          
-          <p-card class="text-center">
-            <div class="text-2xl font-bold text-orange-600">{{ marketplaceData()?.totalRatings || 0 }}</div>
-            <div class="text-sm text-gray-600">Total Ratings</div>
-          </p-card>
-        }
-      </div>
 
       <!-- Subscription Info -->
       @if (subscriptionData()?.isActive) {
-        <p-card class="mb-6">
-          <div class="flex items-center justify-between">
-            <div>
-              <h5 class="text-lg font-semibold text-gray-900 mb-2">Active Subscription</h5>
-              <p class="text-gray-600">{{ subscriptionData()?.tier?.name }} - ${{ subscriptionData()?.tier?.price }}/month</p>
-            </div>
-            <p-tag 
-              [value]="subscriptionData()?.status" 
-              severity="success">
-            </p-tag>
+        <div class="mb-6 relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-600 via-indigo-700 to-indigo-800 shadow-xl border border-indigo-500/20">
+          <!-- Background Pattern -->
+          <div class="absolute inset-0 opacity-10">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-white rounded-full -translate-y-16 translate-x-16"></div>
+            <div class="absolute bottom-0 left-0 w-24 h-24 bg-white rounded-full translate-y-12 -translate-x-12"></div>
           </div>
-        </p-card>
+          
+          <!-- Content -->
+          <div class="relative p-6">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-4">
+                <!-- Premium Icon -->
+                <div class="flex-shrink-0 w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+                  <i class="pi pi-crown text-white text-xl"></i>
+                </div>
+                
+                <!-- Subscription Details -->
+                <div>
+                  <div class="flex items-center gap-3 mb-2">
+                    <h5 class="text-xl font-bold text-white m-0">Active Subscription</h5>
+                    <div class="flex items-center gap-1 px-3 py-1 bg-emerald-500/20 rounded-full">
+                      <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+                      <span class="text-emerald-300 text-sm font-medium">{{ subscriptionData()?.status }}</span>
+                    </div>
+                  </div>
+                  
+                  <div class="flex items-baseline gap-2">
+                    <span class="text-2xl font-bold text-white">{{ subscriptionData()?.tier?.name }}</span>
+                    <span class="text-indigo-200 text-lg">•</span>
+                    <span class="text-3xl font-black text-white">${{ subscriptionData()?.tier?.price }}</span>
+                    <span class="text-indigo-200 text-sm font-medium">/month</span>
+                  </div>
+                  
+                  <!-- Additional Premium Features -->
+                  <div class="flex items-center gap-4 mt-3">
+                    <div class="flex items-center gap-1 text-indigo-200 text-sm">
+                      <i class="pi pi-check-circle text-emerald-400"></i>
+                      <span>Premium Features</span>
+                    </div>
+                    <div class="flex items-center gap-1 text-indigo-200 text-sm">
+                      <i class="pi pi-shield text-emerald-400"></i>
+                      <span>Priority Support</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       }
 
       <!-- Tabs -->
@@ -259,7 +263,6 @@
                 <p-tab
                   [value]="tab.id"
                   [routerLink]="tab.route"
-                  routerLinkActive="p-highlight"
                   class="flex gap-2 items-center text-gray-700 hover:text-primary transition"
                 >
                   <i [class]="tab.icon"></i>
