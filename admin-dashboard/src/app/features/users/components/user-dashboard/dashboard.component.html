@@ -166,9 +166,9 @@
                   <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
                     <i class="pi pi-dollar text-green-600 text-sm"></i>
                   </div>
-                  <div>
+                  <div class="flex flex-col">
                     <span class="text-sm font-medium text-gray-600">Total Investment</span>
-                    <span class="text-lg font-bold text-gray-900 ml-2">{{ formatCurrency(financialStats()?.totalInvested || 0) }}</span>
+                    <span class="text-lg font-bold text-gray-900 whitespace-nowrap">{{ formatCurrency(financialStats()?.totalInvested || 0) }}</span>
                   </div>
                 </div>
               </div>

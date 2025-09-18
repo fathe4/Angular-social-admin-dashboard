@@ -110,7 +110,7 @@ export interface FileUploadResult {
 // For creating new users
 export interface CreateUserRequest {
   email: string;
-  password_hash: string;
+  password: string; // Backend will hash this and store as password_hash
   first_name: string;
   last_name: string;
   username: string;

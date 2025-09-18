@@ -212,7 +212,7 @@ export class UserViewComponent implements OnInit {
       case UserRole.SUPER_ADMIN:
         return 'danger';
       case UserRole.ADMIN:
-        return 'warn';
+        return 'success';
       case UserRole.MODERATOR:
         return 'info';
       case UserRole.USER:
