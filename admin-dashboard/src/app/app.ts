@@ -12,6 +12,7 @@ import { DOCUMENT } from '@angular/common';
 import { SidebarComponent } from './shared/sidebar/sidebar.component';
 import { BreadcrumbService } from './shared/services/breadcrumb.service';
 import { PrimeNG } from 'primeng/config';
+import { updatePrimaryPalette } from '@primeuix/themes';
 import { BreadcrumbComponent } from './shared/components/breadcrumb/breadcrumb.component';
 
 @Component({
@@ -55,6 +56,21 @@ export class App implements OnInit {
 
   ngOnInit() {
     this.primeng.ripple.set(true);
+
+    // Update primary color palette to indigo
+    updatePrimaryPalette({
+      50: '{indigo.50}',
+      100: '{indigo.100}',
+      200: '{indigo.200}',
+      300: '{indigo.300}',
+      400: '{indigo.400}',
+      500: '{indigo.500}',
+      600: '{indigo.600}',
+      700: '{indigo.700}',
+      800: '{indigo.800}',
+      900: '{indigo.900}',
+      950: '{indigo.950}',
+    });
   }
 
   toggleSidebar(): void {

@@ -4,6 +4,7 @@ import { RouterLink } from '@angular/router';
 import { UserService } from '../../services/user.service';
 import { User, UserRole } from '../../models/user.model';
 import { FormsModule } from '@angular/forms';
+import { UserCreateModal } from '../user-create-modal/user-create-modal';
 
 // PrimeNG Modules
 import { TableModule } from 'primeng/table';
@@ -34,6 +35,7 @@ import { Table } from 'primeng/table';
     AvatarModule,
     CardModule,
     ProgressSpinnerModule,
+    UserCreateModal,
   ],
   templateUrl: './user-list.html',
   styleUrl: './user-list.scss',
@@ -46,6 +48,7 @@ export class UserList implements OnInit {
   @ViewChild('roleFilter') roleFilter!: any;
   @ViewChild('statusFilter') statusFilter!: any;
   @ViewChild('locationFilter') locationFilter!: any;
+  @ViewChild('userCreateModal') userCreateModal!: UserCreateModal;
 
   private searchDebounceTimer: any;
 
@@ -311,5 +314,24 @@ export class UserList implements OnInit {
 
   isNumber(value: number | string): value is number {
     return typeof value === 'number';
+  }
+
+  // Modal methods
+  openCreateUserModal(): void {
+    this.userCreateModal.show();
+  }
+
+  onUserCreated(newUser: User): void {
+    // Add the new user to the beginning of the list
+    this.users.update((currentUsers) => [newUser, ...currentUsers]);
+
+    // Update pagination info
+    this.updatePaginationInfo(this.paginationInfo.total + 1);
+
+    console.log('New user created:', newUser);
+  }
+
+  onModalClosed(): void {
+    console.log('Create user modal closed');
   }
 }

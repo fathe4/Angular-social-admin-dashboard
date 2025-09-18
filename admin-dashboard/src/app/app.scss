@@ -37,7 +37,7 @@
 /* New Dashboard Layout */
 .dashboard-layout {
   @apply flex flex-1 relative;
-  margin-top: 64px; // Height of toolbar
+  // margin-top: 64px; // Height of toolbar
   
   .sidebar-container {
     @apply flex-shrink-0;
