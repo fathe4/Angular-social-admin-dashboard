@@ -158,8 +158,18 @@ export class UserList implements OnInit {
   }
 
   deleteUser(user: User): void {
-    // TODO: Implement user deletion with confirmation
-    console.log('Delete user:', user.id);
+    if (confirm('Are you sure you want to delete this user?')) {
+      console.log('Delete user:', user.id);
+      this.userService.deleteUser(user.id).subscribe({
+        next: () => {
+          console.log('User deleted:', user.id);
+          this.loadUsers();
+        },
+        error: (error) => {
+          console.error('Error deleting user:', error);
+        },
+      });
+    }
   }
 
   editUser(user: User): void {

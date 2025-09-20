@@ -18,11 +18,26 @@
   aria-label="Main navigation"
 >
   <!-- Header -->
-  <div class="flex items-center gap-3 p-6 border-b border-white/10">
-    <div class="flex items-center justify-center w-10 h-10 bg-indigo-600 rounded-lg">
-      <mat-icon class="text-white !text-2xl">rocket_launch</mat-icon>
+  <div class="flex items-center justify-between p-6 border-b border-white/10">
+    <div class="flex items-center gap-3">
+      <div class="flex items-center justify-center w-10 h-10 bg-indigo-600 rounded-lg">
+        <mat-icon class="text-white !text-2xl">rocket_launch</mat-icon>
+      </div>
+      <h1 class="text-lg font-bold tracking-tight">Dambala</h1>
     </div>
-    <h1 class="text-lg font-bold tracking-tight">Dambala</h1>
+    
+    <!-- Hamburger Menu Button -->
+    <div class="lg:hidden">
+      <button
+      mat-icon-button
+      (click)="onHamburgerClick()"
+      class="!text-white hover:!bg-white/10 transition-colors duration-200"
+      aria-label="Close sidebar"
+      title="Close sidebar"
+    >
+      <mat-icon class="!text-2xl">close</mat-icon>
+    </button>
+    </div>
   </div>
 
   <!-- Navigation -->
@@ -61,10 +76,10 @@
     </a>
 
     <a 
-      [routerLink]="'/logout'" 
+      href="#"
       class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition 
              text-gray-300 hover:text-white hover:bg-red-600/30"
-      (click)="onNavItemClick()"
+      (click)="onLogoutClick()"
     >
       <mat-icon class="!text-xl">logout</mat-icon>
       <span class="text-sm font-medium">Logout</span>

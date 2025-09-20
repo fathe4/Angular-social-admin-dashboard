@@ -1,7 +1,7 @@
 export const environment = {
   production: false,
   apiUrl: 'http://localhost:5000/api/v1',
-  appName: 'Social Media Admin Dashboard',
+  appName: 'Social Media Dashboard',
   version: '1.0.0',
   // Admin specific configurations
   tokenKey: 'admin_auth_token',

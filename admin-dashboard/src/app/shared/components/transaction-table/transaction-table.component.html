@@ -1,6 +1,6 @@
 <p-table 
   [value]="transactions" 
-  [tableStyle]="{ 'min-width': '50rem' }" 
+  responsiveLayout="stack"
   size="large"
   [paginator]="showPaginator"
   [rows]="rowsPerPage"
@@ -22,10 +22,10 @@
   </ng-template>
   <ng-template #body let-transaction>
     <tr (click)="onTransactionClick(transaction)" class="cursor-pointer hover:bg-gray-50">
-      <td>
+      <td data-label="Transaction ID">
         <span class="font-mono text-sm">{{ truncateId(transaction.id) }}</span>
       </td>
-      <td *ngIf="showUserColumn">
+      <td *ngIf="showUserColumn" data-label="User ID">
         <a 
           routerLink="/dashboard/users/{{ transaction.user_id }}/transactions"
           class="font-mono text-sm text-blue-600 hover:text-blue-800 hover:underline cursor-pointer"
@@ -33,28 +33,28 @@
           {{ truncateId(transaction.user_id) }}
         </a>
       </td>
-      <td>
+      <td data-label="Reference Type">
         <p-tag
           [value]="transaction.reference_type"
           [severity]="getReferenceTypeSeverity(transaction.reference_type)"
         ></p-tag>
       </td>
-      <td>
+      <td data-label="Amount">
         <span class="font-semibold">{{ formatAmount(transaction.amount, transaction.currency) }}</span>
       </td>
-      <td>
+      <td data-label="Payment Method">
         <span class="capitalize">{{ transaction.payment_method }}</span>
       </td>
-      <td>
+      <td data-label="Status">
         <p-tag
           [value]="transaction.status"
           [severity]="getStatusSeverity(transaction.status)"
         ></p-tag>
       </td>
-      <td>
+      <td data-label="Created At">
         <span class="text-sm">{{ formatDate(transaction.created_at) }}</span>
       </td>
-      <td>
+      <td data-label="Completed At">
         <span class="text-sm">{{ formatDate(transaction.completed_at) }}</span>
       </td>
     </tr>

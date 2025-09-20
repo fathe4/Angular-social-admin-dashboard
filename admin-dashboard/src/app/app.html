@@ -1,37 +1,56 @@
 <!-- Modern Admin Dashboard with Spike Sidebar -->
 <div class="modern-dashboard">
-  <!-- Top Toolbar -->
-  <!-- <mat-toolbar color="primary" class="dashboard-toolbar">
-    <button mat-icon-button class="menu-button" (click)="toggleSidebar()">
-      <mat-icon>menu</mat-icon>
-    </button>
-    
-    <span class="toolbar-title">
-      <mat-icon>admin_panel_settings</mat-icon>
-      {{ title() }} Admin Dashboard
-    </span>
-    
-    <span class="toolbar-spacer"></span>
-    
-    <button mat-icon-button class="profile-button">
-      <mat-icon>account_circle</mat-icon>
-    </button>
-  </mat-toolbar> -->
-
   <!-- Main Layout Container -->
-  <div class="dashboard-layout">
+  <div class="dashboard-layout" [class.full-width]="!showSidebar()">
     <!-- Modern Sidebar -->
-    <app-sidebar 
-      class="sidebar-container" 
-      [isOpen]="isSidebarOpen()"
-      (sidebarClose)="closeSidebar()"
-    ></app-sidebar>
+    @if (showSidebar()) {
+      <app-sidebar 
+        class="sidebar-container" 
+        [isOpen]="isSidebarOpen()"
+        (sidebarClose)="closeSidebar()"
+      ></app-sidebar>
+    }
     
     <!-- Main Content Area -->
-    <main class="main-content">
-       <div class="breadcrumb-container">
-        <app-breadcrumb></app-breadcrumb>
-      </div>
+    <main class="main-content" [class.full-width]="!showSidebar()">
+      @if (showSidebar()) {
+        <!-- Top Header with Hamburger Menu -->
+        <div class="top-header">
+          <div class="flex items-center justify-between p-4 bg-white border-b border-gray-200 lg:hidden">
+            <!-- Hamburger Menu Button -->
+            <div class="lg:hidden">
+              <button
+              mat-icon-button
+              (click)="toggleSidebar()"
+              class="!text-gray-600 hover:!bg-gray-100 transition-colors duration-200"
+              aria-label="Toggle sidebar"
+              title="Toggle sidebar"
+            >
+              <mat-icon class="!text-2xl">menu</mat-icon>
+            </button>
+            </div>
+
+            <!-- Spacer -->
+            <div class="flex-1"></div>
+            
+            <!-- User Profile Button -->
+            <button
+              mat-icon-button
+              class="!text-gray-600 hover:!bg-gray-100 transition-colors duration-200"
+              aria-label="User profile"
+              title="User profile"
+            >
+              <mat-icon class="!text-2xl">account_circle</mat-icon>
+            </button>
+          </div>
+          
+          <!-- Breadcrumb -->
+          <div class="breadcrumb-container">
+            <app-breadcrumb></app-breadcrumb>
+          </div>
+        </div>
+      }
+      
       <div class="content-wrapper">
         <router-outlet></router-outlet>
       </div>

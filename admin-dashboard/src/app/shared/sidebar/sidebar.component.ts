@@ -1,9 +1,10 @@
-import { Component, signal, input, output, HostListener } from '@angular/core';
+import { Component, signal, input, output, HostListener, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { LogoutService } from '../../core/services/logout.service';
 
 interface NavItem {
   icon: string;
@@ -28,10 +29,10 @@ interface NavSection {
     RouterLinkActive,
     MatIconModule,
     MatButtonModule,
-    MatTooltipModule
+    MatTooltipModule,
   ],
   templateUrl: './sidebar.component.html',
-  styleUrls: ['./sidebar.component.scss']
+  styleUrls: ['./sidebar.component.scss'],
 })
 export class SidebarComponent {
   // Inputs and outputs for mobile behavior
@@ -39,11 +40,12 @@ export class SidebarComponent {
   readonly sidebarClose = output<void>();
 
   protected readonly isWidgetsExpanded = signal(false);
+  private readonly logoutService = inject(LogoutService);
 
   constructor(private router: Router) {}
 
   toggleWidgets(): void {
-    this.isWidgetsExpanded.update(value => !value);
+    this.isWidgetsExpanded.update((value) => !value);
   }
 
   onNavItemClick(): void {
@@ -51,8 +53,21 @@ export class SidebarComponent {
     this.sidebarClose.emit();
   }
 
+  onLogoutClick(): void {
+    // Call logout service
+    this.logoutService.logout();
+
+    // Close sidebar on mobile
+    this.sidebarClose.emit();
+  }
+
   onBackdropClick(): void {
     // Close sidebar when backdrop is clicked
+    this.sidebarClose.emit();
+  }
+
+  onHamburgerClick(): void {
+    // Close sidebar when hamburger menu is clicked
     this.sidebarClose.emit();
   }
 
