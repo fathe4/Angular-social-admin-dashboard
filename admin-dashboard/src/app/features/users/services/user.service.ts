@@ -191,7 +191,7 @@ export class UserService {
    */
   deleteUser(id: string): Observable<void> {
     return this.http
-      .delete<void>(`${this.apiUrl}${environment.endpoints.users.delete}/${id}`)
+      .delete<void>(`${this.apiUrl}${environment.endpoints.users.delete}/${id}/complete`)
       .pipe(catchError(this.handleError));
   }
 

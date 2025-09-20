@@ -1,5 +1,5 @@
 import { Component, signal, effect, Renderer2, Inject, OnInit } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -14,6 +14,7 @@ import { BreadcrumbService } from './shared/services/breadcrumb.service';
 import { PrimeNG } from 'primeng/config';
 import { updatePrimaryPalette } from '@primeuix/themes';
 import { BreadcrumbComponent } from './shared/components/breadcrumb/breadcrumb.component';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -37,12 +38,14 @@ import { BreadcrumbComponent } from './shared/components/breadcrumb/breadcrumb.c
 export class App implements OnInit {
   protected readonly title = signal('Social Media');
   protected readonly isSidebarOpen = signal(false);
+  protected readonly showSidebar = signal(true);
 
   constructor(
     private renderer: Renderer2,
     private primeng: PrimeNG,
     @Inject(DOCUMENT) private document: Document,
-    private breadcrumbService: BreadcrumbService
+    private breadcrumbService: BreadcrumbService,
+    private router: Router
   ) {
     // Prevent body scroll when sidebar is open on mobile
     effect(() => {
@@ -71,6 +74,22 @@ export class App implements OnInit {
       900: '{indigo.900}',
       950: '{indigo.950}',
     });
+
+    // Listen to route changes to show/hide sidebar
+    this.router.events
+      .pipe(filter((event) => event instanceof NavigationEnd))
+      .subscribe((event: NavigationEnd) => {
+        this.updateSidebarVisibility(event.url);
+      });
+
+    // Check initial route
+    this.updateSidebarVisibility(this.router.url);
+  }
+
+  private updateSidebarVisibility(url: string): void {
+    // Hide sidebar for auth routes (login, unauthorized)
+    const shouldHideSidebar = url.startsWith('/auth') || url.startsWith('/unauthorized');
+    this.showSidebar.set(!shouldHideSidebar);
   }
 
   toggleSidebar(): void {

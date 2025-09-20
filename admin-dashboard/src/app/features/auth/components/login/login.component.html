@@ -1,0 +1,96 @@
+<!-- Full-screen login container -->
+<div class="fixed inset-0 w-screen h-screen flex items-center justify-center bg-slate-50 z-[1000] m-0 p-0">
+  <!-- Background with subtle gradients -->
+  <div class="absolute inset-0 w-full h-full bg-slate-50" 
+       [style.background]="'radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.03) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.8) 0%, transparent 50%), radial-gradient(circle at 40% 40%, rgba(120, 119, 198, 0.02) 0%, transparent 50%)'">
+  </div>
+  
+  <!-- Login content -->
+  <div class="relative z-10 w-full max-w-md px-8 py-4 flex justify-center items-center mx-auto">
+    <!-- Login card with glass morphism effect -->
+    <div class="w-full bg-white/95 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl p-12 relative overflow-hidden">
+      <!-- Top accent line -->
+      <div class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-indigo-200/40 to-transparent"></div>
+      
+      <!-- Header -->
+      <div class="text-center mb-10">
+        <h1 class="text-3xl font-bold text-slate-800 mb-3 tracking-tight">Admin Dashboard</h1>
+        <p class="text-slate-600 text-base font-normal">Sign in to access the admin panel</p>
+      </div>
+
+      <!-- Login form -->
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="mb-8">
+        <!-- Email Field -->
+        <div class="mb-7">
+          <p-floatlabel>
+            <input
+              pInputText
+              id="email"
+              formControlName="email"
+              [class.ng-invalid]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
+              class="w-full"
+              autocomplete="email"
+            />
+            <label for="email">Email Address</label>
+          </p-floatlabel>
+
+          @if (loginForm.get('email')?.invalid && loginForm.get('email')?.touched) {
+          <small class="text-red-600 block mt-1 text-sm font-medium">
+            @if (loginForm.get('email')?.errors?.['required']) { Email is required } 
+            @if (loginForm.get('email')?.errors?.['email']) { Please enter a valid email address }
+          </small>
+          }
+        </div>
+
+        <!-- Password Field -->
+        <div class="mb-7">
+          <p-floatlabel>
+            <p-password
+              formControlName="password"
+              [class.ng-invalid]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
+              styleClass="w-full"
+              inputStyleClass="w-full"
+              [feedback]="false"
+              [toggleMask]="true"
+              autocomplete="current-password"
+            />
+            <label for="password">Password</label>
+          </p-floatlabel>
+
+          @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched) {
+          <small class="text-red-600 block mt-1 text-sm font-medium">
+            @if (loginForm.get('password')?.errors?.['required']) { Password is required } 
+            @if (loginForm.get('password')?.errors?.['minlength']) { Password must be at least 6 characters }
+          </small>
+          }
+        </div>
+
+        <!-- Error Message -->
+        @if (errorMessage()) {
+        <div class="mb-6">
+          <p-message severity="error" [text]="errorMessage()!" styleClass="w-full"></p-message>
+        </div>
+        }
+
+        <!-- Submit Button -->
+        <div>
+          <p-button
+            type="submit"
+            label="Sign In"
+            styleClass="w-full"
+            [loading]="isLoading()"
+            [disabled]="loginForm.invalid || isLoading()"
+            icon="pi pi-sign-in"
+          ></p-button>
+        </div>
+      </form>
+
+      <!-- Footer -->
+      <div class="text-center pt-6 border-t border-slate-200/80">
+        <small class="text-slate-400 text-sm leading-relaxed">
+          Admin access only. Contact your system administrator for account access.
+        </small>
+      </div>
+    </div>
+  </div>
+</div>
