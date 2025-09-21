@@ -22,10 +22,10 @@
   </ng-template>
   <ng-template #body let-transaction>
     <tr (click)="onTransactionClick(transaction)" class="cursor-pointer hover:bg-gray-50">
-      <td data-label="Transaction ID">
+      <td>
         <span class="font-mono text-sm">{{ truncateId(transaction.id) }}</span>
       </td>
-      <td *ngIf="showUserColumn" data-label="User ID">
+      <td *ngIf="showUserColumn">
         <a 
           routerLink="/dashboard/users/{{ transaction.user_id }}/transactions"
           class="font-mono text-sm text-blue-600 hover:text-blue-800 hover:underline cursor-pointer"
@@ -33,28 +33,28 @@
           {{ truncateId(transaction.user_id) }}
         </a>
       </td>
-      <td data-label="Reference Type">
+      <td>
         <p-tag
           [value]="transaction.reference_type"
           [severity]="getReferenceTypeSeverity(transaction.reference_type)"
         ></p-tag>
       </td>
-      <td data-label="Amount">
+      <td>
         <span class="font-semibold">{{ formatAmount(transaction.amount, transaction.currency) }}</span>
       </td>
-      <td data-label="Payment Method">
+      <td>
         <span class="capitalize">{{ transaction.payment_method }}</span>
       </td>
-      <td data-label="Status">
+      <td>
         <p-tag
           [value]="transaction.status"
           [severity]="getStatusSeverity(transaction.status)"
         ></p-tag>
       </td>
-      <td data-label="Created At">
+      <td>
         <span class="text-sm">{{ formatDate(transaction.created_at) }}</span>
       </td>
-      <td data-label="Completed At">
+      <td>
         <span class="text-sm">{{ formatDate(transaction.completed_at) }}</span>
       </td>
     </tr>

@@ -23,7 +23,6 @@ export interface Transaction {
   standalone: true,
   imports: [CommonModule, TableModule, TagModule, RouterLink],
   templateUrl: './transaction-table.component.html',
-  styleUrl: './transaction-table.component.scss',
 })
 export class TransactionTableComponent {
   @Input() transactions: Transaction[] = [];
