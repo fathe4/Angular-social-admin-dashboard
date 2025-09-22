@@ -4,9 +4,7 @@
 }
 
 .breadcrumb-container {
-  background-color: #f8f9fa;
-  border-bottom: 1px solid #e9ecef;
-  padding: 0 1rem;
+  @apply bg-gray-50 border-b border-gray-200 px-4;
 }
 
 .dashboard-toolbar {
@@ -41,58 +39,26 @@
   
   .sidebar-container {
     @apply flex-shrink-0;
-    
-    /* Desktop behavior */
-    @media (min-width: 768px) {
-      @apply relative;
-    }
-    
-    /* Mobile behavior - absolute positioning for overlay */
-    @media (max-width: 767px) {
-      @apply absolute top-0 left-0 bottom-0;
-      width: auto;
-      z-index: 50;
-    }
+    @media (min-width: 768px) { @apply relative; }
+    @media (max-width: 767px) { @apply absolute top-0 left-0 bottom-0 z-50; }
   }
   
   .main-content {
     @apply flex-1 bg-gray-50 overflow-hidden flex flex-col cursor-default;
+    @media (min-width: 768px) { margin-left: 288px; }
+    @media (max-width: 767px) { @apply w-full; margin-left: 0; }
     
-    /* Desktop: Add left margin to account for fixed sidebar */
-    @media (min-width: 768px) {
-      margin-left: 288px; // w-72 = 288px
-    }
-    
-    /* Mobile: Full width when sidebar is hidden */
-    @media (max-width: 767px) {
-      @apply w-full;
-      margin-left: 0;
-    }
-    
-    .top-header {
-      @apply flex-shrink-0;
-    }
-    
-    .content-wrapper {
+    .top-header { @apply flex-shrink-0; }
+    .content-wrapper { 
       @apply flex-1 overflow-y-auto max-w-7xl mx-auto;
-      
-      @media (max-width: 767px) {
-        @apply p-4;
-      }
+      @media (max-width: 767px) { @apply p-4; }
     }
   }
 
-  /* Full-width layout when sidebar is hidden */
-  &.full-width {
-    .main-content {
-      @apply w-full;
-      margin-left: 0 !important;
-      
-      .content-wrapper {
-        @apply max-w-none mx-0;
-        padding: 0;
-      }
-    }
+  &.full-width .main-content {
+    @apply w-full;
+    margin-left: 0 !important;
+    .content-wrapper { @apply max-w-none mx-0; padding: 0; }
   }
 }
 
@@ -203,20 +169,9 @@
   }
 }
 
-// Dark theme support
+// Dark theme and mobile responsive
 @media (prefers-color-scheme: dark) {
-  .dashboard-sidenav {
-    background: linear-gradient(135deg, #4c1d95 0%, #581c87 100%);
-  }
-  
-  .dashboard-content {
-    @apply bg-gray-900;
-  }
+  .dashboard-sidenav { background: linear-gradient(135deg, #4c1d95 0%, #581c87 100%); }
+  .dashboard-content { @apply bg-gray-900; }
 }
-
-// Additional responsive styles for old components
-@media (max-width: 768px) {
-  .dashboard-sidenav {
-    @apply w-full;
-  }
-}
+@media (max-width: 768px) { .dashboard-sidenav { @apply w-full; } }
