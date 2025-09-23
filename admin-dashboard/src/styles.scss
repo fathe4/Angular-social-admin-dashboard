@@ -9,6 +9,18 @@
 // Import PrimeIcons
 @import 'primeicons/primeicons.css';
 
+// PrimeIcons utility classes
+.pi {
+  font-family: 'primeicons' !important;
+  font-style: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  display: inline-block;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -19,7 +31,7 @@ html {
       primary: mat.$azure-palette,
       tertiary: mat.$blue-palette,
     ),
-    typography: Roboto,
+    // typography: Roboto,
     density: 0,
   ));
 }
