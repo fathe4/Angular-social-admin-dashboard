@@ -71,7 +71,6 @@ export const serverRoutes: ServerRoute[] = [
     path: 'dashboard/users/:id/transactions',
     renderMode: RenderMode.Server,
   },
-  // Catch-all for any other routes - use server rendering
   {
     path: '**',
     renderMode: RenderMode.Server,
