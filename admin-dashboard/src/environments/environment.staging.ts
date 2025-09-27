@@ -1,19 +1,19 @@
 export const environment = {
-  production: true,
-  apiUrl: 'https://api.dambala.ca/api/v1',
-  appName: 'Social Media Dashboard',
-  version: '1.0.0',
-
-  // Production specific configurations
+  production: false, // Not quite production, but production-like
+  apiUrl: 'https://staging-api.dambala.ca/api/v1',
+  appName: 'Social Media Dashboard (Staging)',
+  version: '1.0.0-staging',
+  
+  // Staging specific configurations
   debug: false,
-  enableLogging: false, // Disable verbose logging in production
-
+  enableLogging: true, // Keep logging for staging debugging
+  
   // Admin specific configurations
   tokenKey: 'admin_auth_token',
   refreshTokenKey: 'admin_refresh_token',
   sessionTimeout: 3600000, // 1 hour in milliseconds
-
-  // Feature flags for production
+  
+  // Feature flags for staging
   features: {
     enableTestUsers: false,
     showDevTools: false,

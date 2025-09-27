@@ -1,22 +1,22 @@
 export const environment = {
-  production: true,
-  apiUrl: 'https://api.dambala.ca/api/v1',
-  appName: 'Social Media Dashboard',
-  version: '1.0.0',
-
-  // Production specific configurations
-  debug: false,
-  enableLogging: false, // Disable verbose logging in production
-
+  production: false,
+  apiUrl: 'http://localhost:5000/api/v1',
+  appName: 'Social Media Dashboard (Development)',
+  version: '1.0.0-dev',
+  
+  // Development specific configurations
+  debug: true,
+  enableLogging: true,
+  
   // Admin specific configurations
-  tokenKey: 'admin_auth_token',
-  refreshTokenKey: 'admin_refresh_token',
-  sessionTimeout: 3600000, // 1 hour in milliseconds
-
-  // Feature flags for production
+  tokenKey: 'admin_auth_token_dev',
+  refreshTokenKey: 'admin_refresh_token_dev',
+  sessionTimeout: 7200000, // 2 hours in development for easier testing
+  
+  // Feature flags for development
   features: {
-    enableTestUsers: false,
-    showDevTools: false,
+    enableTestUsers: true,
+    showDevTools: true,
     enableMockData: false,
   },
 
