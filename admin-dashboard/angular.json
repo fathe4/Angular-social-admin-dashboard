@@ -98,15 +98,21 @@
         },
         "serve": {
           "builder": "@angular/build:dev-server",
+          "options": {
+            "allowedHosts": ["admin.dambala.ca", "localhost", "127.0.0.1"]
+          },
           "configurations": {
             "production": {
-              "buildTarget": "admin-dashboard:build:production"
+              "buildTarget": "admin-dashboard:build:production",
+              "allowedHosts": ["admin.dambala.ca", "localhost", "127.0.0.1"]
             },
             "development": {
-              "buildTarget": "admin-dashboard:build:development"
+              "buildTarget": "admin-dashboard:build:development",
+              "allowedHosts": ["admin.dambala.ca", "localhost", "127.0.0.1"]
             },
             "staging": {
-              "buildTarget": "admin-dashboard:build:staging"
+              "buildTarget": "admin-dashboard:build:staging",
+              "allowedHosts": ["admin.dambala.ca", "localhost", "127.0.0.1"]
             }
           },
           "defaultConfiguration": "development"
