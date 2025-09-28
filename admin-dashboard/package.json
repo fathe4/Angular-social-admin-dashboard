@@ -5,6 +5,10 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "start:prod": "ng serve --configuration production",
+    "build:prod": "ng build --configuration production",
+    "start:dev": "ng serve --configuration development",
+    "build:dev": "ng build --configuration development",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "serve:ssr:admin-dashboard": "node dist/admin-dashboard/server/server.mjs"
